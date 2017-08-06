@@ -6,46 +6,9 @@ brew(1) -- The missing package manager for macOS
 `brew` `--version`<br>
 `brew` `command` [`--verbose`|`-v`] [`options`] [`formula`] ...
 
-## DESCRIPTION
-
-Homebrew is the easiest and most flexible way to install the UNIX tools Apple
-didn't include with macOS.
-
-## ESSENTIAL COMMANDS
-
-For the full command list, see the [COMMANDS](#commands) section.
-
 With `--verbose` or `-v`, many commands print extra debugging information. Note that these flags should only appear after a command.
 
-  * `install` `formula`:
-    Install `formula`.
-
-  * `uninstall` `formula`:
-    Uninstall `formula`.
-
-  * `update`:
-    Fetch the newest version of Homebrew from GitHub using `git`(1).
-
-  * `list`:
-    List all installed formulae.
-
-  * `search` (`text`|`/``text``/`):
-    Perform a substring search of formula names for `text`. If `text` is
-    surrounded with slashes, then it is interpreted as a regular expression.
-    The search for `text` is extended online to some popular taps.
-    If no search term is given, all locally available formulae are listed.
-
 ## COMMANDS
-
-  * `analytics` [`state`]:
-    Display anonymous user behaviour analytics state.
-    Read more at <https://docs.brew.sh/Analytics.html>.
-
-  * `analytics` (`on`|`off`):
-    Turn on/off Homebrew's analytics.
-
-  * `analytics` `regenerate-uuid`:
-    Regenerate UUID used in Homebrew's analytics.
 
   * `cat` `formula`:
     Display the source to `formula`.
@@ -880,16 +843,6 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Integrates Homebrew formulae with macOS's `launchctl`(1) manager:
     <https://github.com/Homebrew/homebrew-services>
 
-## CUSTOM EXTERNAL COMMANDS
-
-Homebrew, like `git`(1), supports external commands. These are executable
-scripts that reside somewhere in the `PATH`, named `brew-``cmdname` or
-`brew-``cmdname``.rb`, which can be invoked like `brew` `cmdname`. This allows you
-to create your own commands without modifying Homebrew's internals.
-
-Instructions for creating your own commands can be found in the docs:
-<https://docs.brew.sh/External-Commands.html>
-
 ## SPECIFYING FORMULAE
 
 Many Homebrew commands accept one or more `formula` arguments. These arguments
@@ -909,197 +862,9 @@ can take several different forms:
     `https://raw.github.com/Homebrew/homebrew-core/master/Formula/git.rb`.
     The formula file will be cached for later use.
 
-## ENVIRONMENT
-  * `HOMEBREW_ARTIFACT_DOMAIN`:
-    If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries.
-
-  * `HOMEBREW_AUTO_UPDATE_SECS`:
-    If set, Homebrew will only check for autoupdates once per this seconds interval.
-
-    *Default:* `60`.
-
-  * `HOMEBREW_AWS_ACCESS_KEY_ID`, `HOMEBREW_AWS_SECRET_ACCESS_KEY`:
-    When using the `S3` download strategy, Homebrew will look in
-    these variables for access credentials (see
-    <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-environment>
-    to retrieve these access credentials from AWS).  If they are not set,
-    the `S3` download strategy will download with a public
-    (unsigned) URL.
-
-  * `HOMEBREW_BOTTLE_DOMAIN`:
-    If set, instructs Homebrew to use the given URL as a download mirror for bottles.
-
-  * `HOMEBREW_BROWSER`:
-    If set, uses this setting as the browser when opening project homepages,
-    instead of the OS default browser.
-
-  * `HOMEBREW_BUILD_FROM_SOURCE`:
-    If set, instructs Homebrew to compile from source even when a formula
-    provides a bottle. This environment variable is intended for use by
-    Homebrew developers. Please do not file issues if you encounter errors when
-    using this environment variable.
-
-  * `HOMEBREW_CACHE`:
-    If set, instructs Homebrew to use the given directory as the download cache.
-
-    *Default:* `~/Library/Caches/Homebrew`.
-
-  * `HOMEBREW_CURL_VERBOSE`:
-    If set, Homebrew will pass `--verbose` when invoking `curl`(1).
-
-  * `HOMEBREW_DEBUG`:
-    If set, any commands that can emit debugging information will do so.
-
-  * `HOMEBREW_DEBUG_INSTALL`:
-    When `brew install -d` or `brew install -i` drops into a shell,
-    `HOMEBREW_DEBUG_INSTALL` will be set to the name of the formula being
-    brewed.
-
-  * `HOMEBREW_DEBUG_PREFIX`:
-    When `brew install -d` or `brew install -i` drops into a shell,
-    `HOMEBREW_DEBUG_PREFIX` will be set to the target prefix in the Cellar
-    of the formula being brewed.
-
-  * `HOMEBREW_DEVELOPER`:
-    If set, Homebrew will tweak behaviour to be more relevant for Homebrew
-    developers (active or budding) e.g. turning warnings into errors.
-
-  * `HOMEBREW_EDITOR`:
-    If set, Homebrew will use this editor when editing a single formula, or
-    several formulae in the same directory.
-
-    *Note:* `brew edit` will open all of Homebrew as discontinuous files and
-    directories. TextMate can handle this correctly in project mode, but many
-    editors will do strange things in this case.
-
-  * `HOMEBREW_FORCE_VENDOR_RUBY`:
-    If set, Homebrew will always use its vendored, relocatable Ruby 2.0 version
-    even if the system version of Ruby is >=2.0.
-
-  * `HOMEBREW_GIT`:
-    When using Git, Homebrew will use `GIT` if set,
-    a Homebrew-built Git if installed, or the system-provided binary.
-
-    Set this to force Homebrew to use a particular git binary.
-
-  * `HOMEBREW_GITHUB_API_TOKEN`:
-    A personal access token for the GitHub API, which you can create at
-    <https://github.com/settings/tokens>. If set, GitHub will allow you a
-    greater number of API requests. See
-    <https://developer.github.com/v3/#rate-limiting> for more information.
-    Homebrew uses the GitHub API for features such as `brew search`.
-
-    *Note:* Homebrew doesn't require permissions for any of the scopes.
-
-  * `HOMEBREW_LOGS`:
-    If set, Homebrew will use the given directory to store log files.
-
-  * `HOMEBREW_MAKE_JOBS`:
-    If set, instructs Homebrew to use the value of `HOMEBREW_MAKE_JOBS` as
-    the number of parallel jobs to run when building with `make`(1).
-
-    *Default:* the number of available CPU cores.
-
-  * `HOMEBREW_NO_ANALYTICS`:
-    If set, Homebrew will not send analytics. See: <https://docs.brew.sh/Analytics.html>
-
-  * `HOMEBREW_NO_AUTO_UPDATE`:
-    If set, Homebrew will not auto-update before running `brew install`,
-    `brew upgrade` or `brew tap`.
-
-  * `HOMEBREW_NO_EMOJI`:
-    If set, Homebrew will not print the `HOMEBREW_INSTALL_BADGE` on a
-    successful build.
-
-    *Note:* Homebrew will only try to print emoji on Lion or newer.
-
-  * `HOMEBREW_NO_INSECURE_REDIRECT`:
-    If set, Homebrew will not permit redirects from secure HTTPS
-    to insecure HTTP.
-
-    While ensuring your downloads are fully secure, this is likely
-    to cause from-source SourceForge, some GNU & GNOME based
-    formulae to fail to download.
-
-  * `HOMEBREW_NO_GITHUB_API`:
-    If set, Homebrew will not use the GitHub API for e.g searches or
-    fetching relevant issues on a failed install.
-
-  * `HOMEBREW_INSTALL_BADGE`:
-    Text printed before the installation summary of each successful build.
-    Defaults to the beer emoji.
-
-  * `HOMEBREW_SVN`:
-    When exporting from Subversion, Homebrew will use `HOMEBREW_SVN` if set,
-    a Homebrew-built Subversion if installed, or the system-provided binary.
-
-    Set this to force Homebrew to use a particular `svn` binary.
-
-  * `HOMEBREW_TEMP`:
-    If set, instructs Homebrew to use `HOMEBREW_TEMP` as the temporary directory
-    for building packages. This may be needed if your system temp directory and
-    Homebrew Prefix are on different volumes, as macOS has trouble moving
-    symlinks across volumes when the target does not yet exist.
-
-    This issue typically occurs when using FileVault or custom SSD
-    configurations.
-
-  * `HOMEBREW_VERBOSE`:
-    If set, Homebrew always assumes `--verbose` when running commands.
-
-## USING HOMEBREW BEHIND A PROXY
-
-Homebrew uses several commands for downloading files (e.g. `curl`, `git`, `svn`).
-Many of these tools can download via a proxy. It's common for these tools
-to read proxy parameters from environment variables.
-
-For the majority of cases setting `http_proxy` is enough. You can set this in
-your shell profile, or you can use it before a brew command:
-
-    http_proxy=http://`host`:`port` brew install foo
-
-If your proxy requires authentication:
-
-    http_proxy=http://`user`:`password`@`host`:`port` brew install foo
-
-## SEE ALSO
-
-Homebrew Documentation: <https://docs.brew.sh>
-
-`brew-cask`(1), `git`(1), `git-log`(1)
-
-## AUTHORS
-
-Homebrew's lead maintainer is Mike McQuaid.
-
-Homebrew/homebrew-core's lead maintainer is ilovezfs.
-
-Homebrew's other current maintainers are Alyssa Ross, Andrew Janke, Alex Dunn, FX Coudert, Josh Hagins, JCount, Misty De Meo, neutric, Tomasz Pajor, Markus Reiter, Tim Smith, Tom Schoonjans, Uladzislau Shablinski and William Woodruff.
-
-Former maintainers with significant contributions include Baptiste Fontaine, Xu Cheng, Martin Afanasjew, Dominyk Tiller, Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg and Homebrew's creator: Max Howell.
-
-## BUGS
-
-See our issues on GitHub:
-
- * Homebrew/brew <https://github.com/Homebrew/brew/issues>
-
- * Homebrew/homebrew-core <https://github.com/Homebrew/homebrew-core/issues>
-
-
 [SYNOPSIS]: #SYNOPSIS "SYNOPSIS"
-[DESCRIPTION]: #DESCRIPTION "DESCRIPTION"
-[ESSENTIAL COMMANDS]: #ESSENTIAL-COMMANDS "ESSENTIAL COMMANDS"
 [COMMANDS]: #COMMANDS "COMMANDS"
 [DEVELOPER COMMANDS]: #DEVELOPER-COMMANDS "DEVELOPER COMMANDS"
 [OFFICIAL EXTERNAL COMMANDS]: #OFFICIAL-EXTERNAL-COMMANDS "OFFICIAL EXTERNAL COMMANDS"
 [CUSTOM EXTERNAL COMMANDS]: #CUSTOM-EXTERNAL-COMMANDS "CUSTOM EXTERNAL COMMANDS"
 [SPECIFYING FORMULAE]: #SPECIFYING-FORMULAE "SPECIFYING FORMULAE"
-[ENVIRONMENT]: #ENVIRONMENT "ENVIRONMENT"
-[USING HOMEBREW BEHIND A PROXY]: #USING-HOMEBREW-BEHIND-A-PROXY "USING HOMEBREW BEHIND A PROXY"
-[SEE ALSO]: #SEE-ALSO "SEE ALSO"
-[AUTHORS]: #AUTHORS "AUTHORS"
-[BUGS]: #BUGS "BUGS"
-
-
-[-]: -.html
