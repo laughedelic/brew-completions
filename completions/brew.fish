@@ -57,3 +57,49 @@ function __fish_brew_opt -d 'Helps matching brew options against the given list'
         end
     end
 end
+
+# These functions return lists of completed arguments
+function __fish_brew_formulae_all
+    brew search
+end
+
+function __fish_brew_formulae_installed
+    brew list
+end
+
+function __fish_brew_formulae_pinned
+    brew list --pinned
+end
+
+function __fish_brew_formulae_multiple_versions -d 'List of installed formulae with their multiple versions'
+    brew list --versions --multiple \
+    # replace first space with tab to make the following a description in the completions list:
+    | string replace -r '\s' '\t' \
+    # a more visible versions separator:
+    | string replace --all ' ' ', '
+end
+
+function __fish_brew_formula_versions -a formula -d 'List of versions for a given formula'
+    brew list --versions $formula \
+    # cut off the first word in the output which is the formula name
+    | string replace -r '\S+\s+' '' \
+    # make it a list
+    | string split ' '
+end
+
+function __fish_brew_formulae_outdated -d 'Returns a list of outdated formulae with the information about potential upgrade'
+    brew outdated --verbose \
+    # replace first space with tab to make the following a description in the completions list:
+    | string replace -r '\s' '\t'
+end
+
+# testing outdated formulae completion
+complete -f -c brew -n '__fish_brew_command upgrade' -a '(__fish_brew_formulae_outdated)'
+
+# testing switch completion: first arg is a formula with multiple version
+complete -f -r -c brew -n '__fish_brew_command switch' -a '(__fish_brew_formulae_multiple_versions)' \
+    -n '[ (count (__fish_brew_args)) = 1 ]' # completing only the first arg of the switch command
+
+# second arg is a list of versions for the formula (which is the previous arg)
+complete -f -r -c brew -n '__fish_brew_command switch' -a '(__fish_brew_formula_versions (__fish_brew_args)[-1])' \
+    -n '[ (count (__fish_brew_args)) = 2 ]' # completing only the second arg of the switch command
