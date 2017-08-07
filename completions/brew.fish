@@ -94,12 +94,13 @@ function __fish_brew_formulae_outdated -d 'Returns a list of outdated formulae w
 end
 
 # testing outdated formulae completion
-complete -f -c brew -n '__fish_brew_command upgrade' -a '(__fish_brew_formulae_outdated)'
+complete -f -c brew -n '__fish_brew_command upgrade' \
+    -a '(__fish_brew_formulae_outdated)'
 
 # testing switch completion: first arg is a formula with multiple version
-complete -f -r -c brew -n '__fish_brew_command switch' -a '(__fish_brew_formulae_multiple_versions)' \
-    -n '[ (count (__fish_brew_args)) = 1 ]' # completing only the first arg of the switch command
+complete -f -r -c brew -n '__fish_brew_command switch; and [ (count (__fish_brew_args)) = 1 ]' \
+    -a '(__fish_brew_formulae_multiple_versions)'
 
 # second arg is a list of versions for the formula (which is the previous arg)
-complete -f -r -c brew -n '__fish_brew_command switch' -a '(__fish_brew_formula_versions (__fish_brew_args)[-1])' \
-    -n '[ (count (__fish_brew_args)) = 2 ]' # completing only the second arg of the switch command
+complete -f -r -c brew -n '__fish_brew_command switch; and [ (count (__fish_brew_args)) = 2 ]' \
+    -a '(__fish_brew_formula_versions (__fish_brew_args)[-1])'
