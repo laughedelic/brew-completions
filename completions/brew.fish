@@ -80,11 +80,29 @@ function __fish_brew_formulae_multiple_versions -d 'List of installed formulae w
 end
 
 function __fish_brew_formula_versions -a formula -d 'List of versions for a given formula'
+    set -q $formula
+    or set formula (__fish_brew_args)[-1]
+
     brew list --versions $formula \
         # cut off the first word in the output which is the formula name
         | string replace -r '\S+\s+' '' \
         # make it a list
         | string split ' '
+end
+
+function __fish_brew_formula_options -a formula -d 'List installation options for a given formula'
+    set -q $formula
+    or set formula (__fish_brew_args)[-1]
+
+    function list_pairs
+        set -q argv[2]; or return 0
+        echo $argv[1]\t$argv[2]
+        set -e argv[1..2]
+        list_pairs $argv
+    end
+
+    # brew options lists options name and its description on different lines
+    list_pairs (brew options $formula | string trim)
 end
 
 function __fish_brew_formulae_outdated -d 'Returns a list of outdated formulae with the information about potential upgrade'
@@ -240,3 +258,40 @@ __complete_brew_arg 'info abv;
         __fish_brew_opt --json=v1;
         and not __fish_brew_opt --installed --all
     end' -l installed -d 'Display JSON info for installed formulae'
+
+
+__complete_brew_cmd 'install' 'Install formula'
+__complete_brew_arg 'install' -a '(__fish_brew_formulae_all)'
+
+__complete_brew_arg 'install' -s d -l debug -d 'If install fails, open shell in temp directory'
+# --env takes single obligatory argument:
+__complete_brew_arg 'install; and not __fish_brew_opt --env' -l env -d 'Specify build environment' -r -a '
+    std\t"Use standard build environment"
+    super\t"Use superenv"
+'
+# --ignore-dependencies and --only-dependencies are mutually exclusive:
+__complete_brew_arg 'install;
+    and not __fish_brew_opt --only-dependencies --ignore-dependencies
+    ' -l ignore-dependencies -d 'Skip installing any dependencies of any kind'
+__complete_brew_arg 'install;
+    and not __fish_brew_opt --only-dependencies --ignore-dependencies
+    ' -l only-dependencies   -d 'Install dependencies but not the formula itself'
+__complete_brew_arg 'install' -l cc -d 'Attempt to compile using the specified compiler' \
+    -a 'clang gcc-4.0 gcc-4.2 gcc-4.3 gcc-4.4 gcc-4.5 gcc-4.6 gcc-4.7 gcc-4.8 gcc-4.9 llvm-gcc'
+# --build-from-source and --force-bottle are mutually exclusive:
+__complete_brew_arg 'install; and not __fish_brew_opt --force-bottle'    -s s -l build-from-source -d 'Compile the formula from source'
+# FIXME: -s misbehaves allowing --force-bottle
+__complete_brew_arg 'install; and not __fish_brew_opt -s --build-from-source' -l force-bottle      -d 'Install from a bottle if it exists'
+# --HEAD and --devel are mutually exclusive:
+__complete_brew_arg 'install; and not __fish_brew_opt --HEAD'  -l devel -d 'Install the development version'
+__complete_brew_arg 'install; and not __fish_brew_opt --devel' -l HEAD  -d 'Install the HEAD version'
+__complete_brew_arg 'install' -l keep-tmp     -d 'Keep temp files created during installation'
+__complete_brew_arg 'install' -l build-bottle -d 'Prepare the formula for eventual bottling during installation'
+
+__complete_brew_arg 'install' -s i -l interactive -d 'Download and patch formula, then open a shell'
+__complete_brew_arg 'install; and __fish_brew_opt -i --interactive' -s g -l git -d 'Create a Git repository for working on patches'
+
+__complete_brew_arg 'install;
+    and [ (count (__fish_brew_args)) -ge 2 ];
+    and not string match --quiet -- "-*" (__fish_brew_args)[-1]
+    ' -a '(__fish_brew_formula_options (__fish_brew_args)[-1])'
