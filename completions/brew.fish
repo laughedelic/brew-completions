@@ -342,3 +342,57 @@ __complete_brew_arg 'list ls;
 
 __complete_brew_cmd 'log' 'Show git log for formula'
 __complete_brew_arg 'log' -a '(__fish_brew_formulae_all)'
+
+
+__complete_brew_cmd 'migrate' 'Migrate renamed packages to new name'
+# NOTE: should this work only with installed formulae?
+__complete_brew_arg 'migrate' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'migrate' -s f -l force -d 'Treat installed and passed formulae like if they are from same taps and migrate them anyway'
+
+
+__complete_brew_cmd 'missing' 'Check given formula (or all) for missing dependencies'
+__complete_brew_arg 'missing' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'missing' -l hide -d 'Act as if it\'s not installed' -r -a '(__fish_brew_formulae_installed)'
+
+
+__complete_brew_cmd 'options' 'Display install options for formula'
+__complete_brew_arg 'options; and not __fish_brew_opt --installed --all' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'options; and not __fish_brew_opt --installed --all' -l all       -d 'Show options for all formulae'
+__complete_brew_arg 'options; and not __fish_brew_opt --installed --all' -l installed -d 'Show options for all installed formulae'
+__complete_brew_arg 'options' -l compact -d 'Show options as a space-delimited list'
+
+
+__complete_brew_cmd 'outdated' 'Show formula that have updated version available'
+__complete_brew_arg 'outdated; and not __fish_brew_opt --quiet -v --verbose --json=v1'      -l quiet   -d 'Display only names'
+__complete_brew_arg 'outdated; and not __fish_brew_opt --quiet -v --verbose --json=v1' -s v -l verbose -d 'Display detailed version information'
+__complete_brew_arg 'outdated; and not __fish_brew_opt --quiet -v --verbose --json=v1'      -l json=v1 -d 'Format output in JSON format'
+# NOTE: check if this option requires a formula argument:
+__complete_brew_arg 'outdated' -l fetch-HEAD -d 'Fetch the upstream repository to detect if the HEAD installation is outdated'
+
+
+# TODO: should suggest only unpinned formulae and show their current versions in the description
+__complete_brew_cmd 'pin' 'Pin the specified formulae to their current versions'
+__complete_brew_arg 'pin' -a '(__fish_brew_formulae_installed)'
+
+
+__complete_brew_cmd 'postinstall' 'Rerun the post-install steps for formula'
+__complete_brew_arg 'postinstall' -a '(__fish_brew_formulae_installed)'
+
+
+__complete_brew_cmd 'prune' 'Remove dead symlinks'
+__complete_brew_arg 'prune' -s n -l dry-run -d 'Show what files would be removed'
+
+
+__complete_brew_cmd 'reinstall' 'Uninstall and then install again'
+__complete_brew_arg 'reinstall' -a '(__fish_brew_formulae_installed)'
+
+
+__complete_brew_cmd 'search' 'Display all locally available formulae or search by name/description'
+__complete_brew_arg 'search -S; and not __fish_brew_opts' -l desc -d 'Search also in descriptions'
+for repo in debian fedora fink macports opensuse ubuntu
+    __complete_brew_arg "search -S; and not __fish_brew_opts" -l $repo -d 'Search only in this repository'
+end
+
+
+__complete_brew_cmd 'sh' 'Start a Homebrew build environment shell'
+__complete_brew_arg 'sh' -l env=std -d 'Use standard PATH instead of superenv\'s'
