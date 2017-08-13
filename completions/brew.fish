@@ -285,13 +285,60 @@ __complete_brew_arg 'install; and not __fish_brew_opt -s --build-from-source' -l
 # --HEAD and --devel are mutually exclusive:
 __complete_brew_arg 'install; and not __fish_brew_opt --HEAD'  -l devel -d 'Install the development version'
 __complete_brew_arg 'install; and not __fish_brew_opt --devel' -l HEAD  -d 'Install the HEAD version'
-__complete_brew_arg 'install' -l keep-tmp     -d 'Keep temp files created during installation'
-__complete_brew_arg 'install' -l build-bottle -d 'Prepare the formula for eventual bottling during installation'
-
-__complete_brew_arg 'install' -s i -l interactive -d 'Download and patch formula, then open a shell'
+__complete_brew_arg 'install'      -l keep-tmp     -d 'Keep temp files created during installation'
+__complete_brew_arg 'install'      -l build-bottle -d 'Prepare the formula for eventual bottling during installation'
+__complete_brew_arg 'install' -s i -l interactive  -d 'Download and patch formula, then open a shell'
 __complete_brew_arg 'install; and __fish_brew_opt -i --interactive' -s g -l git -d 'Create a Git repository for working on patches'
-
+# fomrula installtion options are listed after the formula name:
 __complete_brew_arg 'install;
     and [ (count (__fish_brew_args)) -ge 2 ];
     and not string match --quiet -- "-*" (__fish_brew_args)[-1]
     ' -a '(__fish_brew_formula_options (__fish_brew_args)[-1])'
+
+
+__complete_brew_cmd 'irb' 'Enter the interactive Homebrew Ruby shell'
+__complete_brew_arg 'irb' -l examples -d 'Show several examples'
+
+
+__complete_brew_cmd 'leaves' 'Installed formulae that are not dependencies of another installed formula'
+
+
+__complete_brew_cmd 'link' 'Symlink installed formula files'
+__complete_brew_arg 'link ln' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'link ln'      -l overwrite -d 'Overwrite existing files'
+__complete_brew_arg 'link ln' -s n -l dry-run   -d 'Show what files would be linked or overwritten'
+__complete_brew_arg 'link ln' -s f -l force     -d 'Allow keg-only formulae to be linked'
+
+
+__complete_brew_cmd 'linkapps' 'Symlink .app bundles into /Applications (deprecated)'
+__complete_brew_arg 'linkapps' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'linkapps' -l local -d 'Link into ~/Applications instead'
+
+
+__complete_brew_cmd 'list' 'List installed formulae'
+__complete_brew_arg 'list ls' -a '(__fish_brew_formulae_installed)'
+# --full-name or --unbrewed exclude any other arguments or options
+__complete_brew_arg 'list ls; and [ (count (__fish_brew_args)) = 1 ]' -l full-name -d 'Print formulae with fully-qualified names'
+__complete_brew_arg 'list ls; and [ (count (__fish_brew_args)) = 1 ]' -l unbrewed -d 'List all files in the Homebrew prefix not installed by brew'
+# --versions and --pinned work only with each other or alone
+__complete_brew_arg 'list ls;
+    and begin
+        not __fish_brew_opts;
+        or      __fish_brew_opt --versions
+        and not __fish_brew_opt --pinned
+    end' -l pinned   -d 'Show the versions of pinned formulae'
+__complete_brew_arg 'list ls;
+    and begin
+        not __fish_brew_opts;
+        or      __fish_brew_opt --pinned
+        and not __fish_brew_opt --versions
+    end' -l versions -d 'Show the version number'
+# --multiple is an additional option for --versions
+__complete_brew_arg 'list ls;
+    and     __fish_brew_opt --versions
+    and not __fish_brew_opt --multiple
+    ' -l multiple -d 'Only show formulae with multiple versions'
+
+
+__complete_brew_cmd 'log' 'Show git log for formula'
+__complete_brew_arg 'log' -a '(__fish_brew_formulae_all)'
