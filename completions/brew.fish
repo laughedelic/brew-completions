@@ -124,3 +124,54 @@ complete -f -r -c brew -n '__fish_brew_command switch; and [ (count (__fish_brew
 # second arg is a list of versions for the formula (which is the previous arg)
 complete -f -r -c brew -n '__fish_brew_command switch; and [ (count (__fish_brew_args)) = 2 ]' \
     -a '(__fish_brew_formula_versions (__fish_brew_args)[-1])'
+
+
+##############
+## COMMANDS ##
+##############
+
+
+__complete_brew_cmd 'cat' 'Display the source to formula'
+__complete_brew_arg 'cat' -a '(__fish_brew_formulae_all)'
+
+
+__complete_brew_cmd 'cleanup' 'Remove old installed versions'
+__complete_brew_arg 'cleanup' -a '(__fish_brew_installed_formulas)'
+__complete_brew_arg 'cleanup'      -l prune   -d 'Remove all cache files older than given number of days' -a '(seq 1 5)'
+__complete_brew_arg 'cleanup' -s n -l dry-run -d 'Show what files would be removed'
+__complete_brew_arg 'cleanup' -s s            -d 'Scrub the cache, removing downloads for even the latest versions of formulae'
+
+
+__complete_brew_cmd 'command' 'Display the path to command file'
+__complete_brew_arg 'command' -a '__fish_brew_commands_list'
+
+
+__complete_brew_cmd 'commands' 'List built-in and external commands'
+__complete_brew_arg 'commands' -l quiet           -d 'List only the names of commands without the header'
+__complete_brew_arg 'commands; and __fish_brew_opt --quiet' \
+                                    -l include-aliases -d 'The aliases of internal commands will be included'
+
+
+__complete_brew_cmd 'config' 'Show Homebrew and system configuration for debugging'
+
+
+__complete_brew_cmd 'diy' 'Determine installation prefix for non-brew software'
+__complete_brew_arg 'diy configure' -r -l 'name=name'       -d 'Set name of package'
+__complete_brew_arg 'diy configure' -r -l 'version=version' -d 'Set version of package'
+
+
+__complete_brew_cmd 'doctor' 'Check your system for potential problems'
+
+
+__complete_brew_cmd 'gist-logs' 'Upload logs for a failed build of formula to a new Gist'
+__complete_brew_arg 'gist-logs' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'gist-logs' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'gist-logs' -s n -l new-issue -d 'Also create a new issue in the appropriate GitHub repository'
+
+
+__complete_brew_cmd 'help' 'Display help for given command'
+__complete_brew_arg 'help' -a '(__fish_brew_commands_list)'
+
+
+__complete_brew_cmd 'home' 'Open Homebrew/formula\'s homepage'
+__complete_brew_arg 'home' -a '(__fish_brew_formulae_all)'
