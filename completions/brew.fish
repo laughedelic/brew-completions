@@ -194,6 +194,21 @@ __complete_brew_arg 'diy configure' -r -l 'version=version' -d 'Set version of p
 __complete_brew_cmd 'doctor' 'Check your system for potential problems'
 
 
+__complete_brew_cmd 'fetch' 'Download source packages for given formulae'
+__complete_brew_arg 'fetch' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'fetch' -s f -l force             -d 'Remove a previously cached version and re-fetch'
+__complete_brew_arg 'fetch' -l deps              -d 'Also download dependencies'
+__complete_brew_arg 'fetch' -l build-from-source -d 'Fetch source package instead of bottle'
+__complete_brew_arg 'fetch' -s v -l verbose                -d 'Do a verbose VCS checkout'
+__complete_brew_arg 'fetch' -l retry              -d 'Retry if a download fails or re-download if the checksum has changed'
+# --HEAD and --devel are mutually exclusive:
+__complete_brew_arg 'fetch; and not __fish_brew_opt --HEAD'  -l devel             -d 'Download the development version from a VCS'
+__complete_brew_arg 'fetch; and not __fish_brew_opt --devel' -l HEAD              -d 'Download the HEAD version from a VCS'
+# --build-from-source and --force-bottle are mutually exclusive:
+__complete_brew_arg 'fetch; and not __fish_brew_opt --force-bottle'    -s s -l build-from-source -d 'Download the source rather than a bottle'
+__complete_brew_arg 'fetch; and not __fish_brew_opt --build-from-source -s' -l force-bottle      -d 'Download a bottle if it exists'
+
+
 __complete_brew_cmd 'gist-logs' 'Upload logs for a failed build of formula to a new Gist'
 __complete_brew_arg 'gist-logs' -a '(__fish_brew_formulae_all)'
 __complete_brew_arg 'gist-logs' -a '(__fish_brew_formulae_all)'
