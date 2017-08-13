@@ -155,6 +155,29 @@ __complete_brew_arg 'commands; and __fish_brew_opt --quiet' \
 __complete_brew_cmd 'config' 'Show Homebrew and system configuration for debugging'
 
 
+__complete_brew_cmd 'deps' 'Show dependencies for given formulae'
+# accepts formulae argument only without --all or --installed options:
+__complete_brew_arg 'deps; and not __fish_brew_opt --all --installed' -a '(__fish_brew_formulae_all)'
+# options that work only without --tree:
+__complete_brew_arg 'deps; and not __fish_brew_opt --tree' -s n         -d 'Show in topological order'
+__complete_brew_arg 'deps; and not __fish_brew_opt --tree' -l 1         -d 'Show only 1 level down'
+__complete_brew_arg 'deps; and not __fish_brew_opt --tree' -l union     -d 'Show the union of dependencies for formulae, instead of the intersection'
+__complete_brew_arg 'deps; and not __fish_brew_opt --tree' -l full-name -d 'List dependencies by their full name'
+# --all and --installed are mutually exclusive:
+__complete_brew_arg 'deps; and not __fish_brew_opt --installed --tree' -l all       -d 'Show dependencies for all formulae'
+__complete_brew_arg 'deps; and not __fish_brew_opt --all'              -l installed -d 'Show dependencies for installed formulae'
+# --tree works without options or with --installed
+__complete_brew_arg 'deps;
+    and begin
+        not __fish_brew_opts;
+        or __fish_brew_opt --installed;
+    end' -l tree -d 'Show dependencies as tree'
+# filters can be passed with any other options
+__complete_brew_arg 'deps' -l include-build    -d 'Include the :build type dependencies'
+__complete_brew_arg 'deps' -l include-optional -d 'Include the :optional type dependencies'
+__complete_brew_arg 'deps' -l skip-recommended -d 'Skip :recommended  type  dependencies'
+
+
 __complete_brew_cmd 'diy' 'Determine installation prefix for non-brew software'
 __complete_brew_arg 'diy configure' -r -l 'name=name'       -d 'Set name of package'
 __complete_brew_arg 'diy configure' -r -l 'version=version' -d 'Set version of package'
