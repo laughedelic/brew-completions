@@ -178,6 +178,14 @@ __complete_brew_arg 'deps' -l include-optional -d 'Include the :optional type de
 __complete_brew_arg 'deps' -l skip-recommended -d 'Skip :recommended  type  dependencies'
 
 
+__complete_brew_cmd 'desc' 'Show formulae description or search by name and/or description'
+__complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -a '(__fish_brew_formulae_all)'
+# FIXME: -n behaves differently from everything else
+__complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -r -s n -l name        -d 'Search only names'
+__complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -r -s d -l description -d 'Search only descriptions'
+__complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -r -s s -l search      -d 'Search names and descriptions'
+
+
 __complete_brew_cmd 'diy' 'Determine installation prefix for non-brew software'
 __complete_brew_arg 'diy configure' -r -l 'name=name'       -d 'Set name of package'
 __complete_brew_arg 'diy configure' -r -l 'version=version' -d 'Set version of package'
