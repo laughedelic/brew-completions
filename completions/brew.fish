@@ -1,5 +1,9 @@
 # Fish shell completions for Homebrew
 
+##########################
+## COMMAND LINE PARSING ##
+##########################
+
 function __fish_brew_args -d 'returns a list of all arguments given to brew'
 
     set -l tokens (commandline --tokenize --current-process --cut-at-cursor)
@@ -22,7 +26,7 @@ end
 #
 function __fish_brew_command -d 'Helps matching the first argument of brew'
     set cmds (__fish_brew_args)
-    set -q cmds[1]; or false
+    set -q cmds[1]; or return 1
 
     if count $argv
         contains -- $cmds[1] $argv
@@ -40,23 +44,19 @@ end
 # * `not __fish_brew_opt --foo --bar` will work only if _neither_ `--foo` _nor_ `--bar` are present
 #
 function __fish_brew_opt -d 'Helps matching brew options against the given list'
-    set opts (__fish_brew_opts)
 
-    if not count $argv
-        not count $opts
-    else
-        if [ "$argv[1]" = "" ]
-            not count $opts
-            or __fish_brew_opt $argv[2..-1]
-        else
-            contains -- $argv[1] $opts
-            and begin
-                [ (count $argv) = 1 ]
-                or __fish_brew_opt $argv[2..-1]
-            end
-        end
+    not count $argv
+    or contains -- $argv[1] (__fish_brew_opts)
+    or begin
+        set -q argv[2]
+        and __fish_brew_opt $argv[2..-1]
     end
 end
+
+
+######################
+## SUGGESTION LISTS ##
+######################
 
 # These functions return lists of completed arguments
 function __fish_brew_formulae_all
@@ -73,24 +73,44 @@ end
 
 function __fish_brew_formulae_multiple_versions -d 'List of installed formulae with their multiple versions'
     brew list --versions --multiple \
-    # replace first space with tab to make the following a description in the completions list:
-    | string replace -r '\s' '\t' \
-    # a more visible versions separator:
-    | string replace --all ' ' ', '
+        # replace first space with tab to make the following a description in the completions list:
+        | string replace -r '\s' '\t' \
+        # a more visible versions separator:
+        | string replace --all ' ' ', '
 end
 
 function __fish_brew_formula_versions -a formula -d 'List of versions for a given formula'
     brew list --versions $formula \
-    # cut off the first word in the output which is the formula name
-    | string replace -r '\S+\s+' '' \
-    # make it a list
-    | string split ' '
+        # cut off the first word in the output which is the formula name
+        | string replace -r '\S+\s+' '' \
+        # make it a list
+        | string split ' '
 end
 
 function __fish_brew_formulae_outdated -d 'Returns a list of outdated formulae with the information about potential upgrade'
     brew outdated --verbose \
-    # replace first space with tab to make the following a description in the completions list:
-    | string replace -r '\s' '\t'
+        # replace first space with tab to make the following a description in the completions list:
+        | string replace -r '\s' '\t'
+end
+
+function __fish_brew_commands_list -d "Lists all commands names, including aliases"
+    brew commands --quiet --include-aliases
+end
+
+
+##########################
+## COMPLETION SHORTCUTS ##
+##########################
+
+function __complete_brew_cmd -a cmd -d "A shortcut for defining brew commands completions"
+    set -e argv[1]
+    complete -f -c brew -n 'not __fish_brew_command' -a $cmd -d $argv
+end
+
+function __complete_brew_arg -a cond -d "A shortcut for defining arguments completion for brew commands"
+    set -e argv[1]
+    # NOTE: $cond can be just a name of a command (or several) or additionally any other condition
+    complete -f -c brew -n "__fish_brew_command $cond" $argv
 end
 
 # testing outdated formulae completion
