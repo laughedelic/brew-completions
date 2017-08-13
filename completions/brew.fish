@@ -68,7 +68,9 @@ function __fish_brew_formulae_installed
 end
 
 function __fish_brew_formulae_pinned
-    brew list --pinned
+    brew list --pinned --versions \
+        # replace first space with tab to make the following a description in the completions list:
+        | string replace -r '\s' '\t'
 end
 
 function __fish_brew_formulae_multiple_versions -d 'List of installed formulae with their multiple versions'
@@ -80,9 +82,6 @@ function __fish_brew_formulae_multiple_versions -d 'List of installed formulae w
 end
 
 function __fish_brew_formula_versions -a formula -d 'List of versions for a given formula'
-    set -q $formula
-    or set formula (__fish_brew_args)[-1]
-
     brew list --versions $formula \
         # cut off the first word in the output which is the formula name
         | string replace -r '\S+\s+' '' \
@@ -91,9 +90,6 @@ function __fish_brew_formula_versions -a formula -d 'List of versions for a give
 end
 
 function __fish_brew_formula_options -a formula -d 'List installation options for a given formula'
-    set -q $formula
-    or set formula (__fish_brew_args)[-1]
-
     function list_pairs
         set -q argv[2]; or return 0
         echo $argv[1]\t$argv[2]
@@ -105,10 +101,18 @@ function __fish_brew_formula_options -a formula -d 'List installation options fo
     list_pairs (brew options $formula | string trim)
 end
 
-function __fish_brew_formulae_outdated -d 'Returns a list of outdated formulae with the information about potential upgrade'
+function __fish_brew_formulae_outdated -d 'List of outdated formulae with the information about potential upgrade'
     brew outdated --verbose \
         # replace first space with tab to make the following a description in the completions list:
         | string replace -r '\s' '\t'
+end
+
+function __fish_brew_taps_installed -d 'List all available taps'
+    brew tap
+end
+
+function __fish_brew_taps_pinned -d 'List only pinned taps'
+    brew tap --list-pinned
 end
 
 function __fish_brew_commands_list -d "Lists all commands names, including aliases"
@@ -131,18 +135,6 @@ function __complete_brew_arg -a cond -d "A shortcut for defining arguments compl
     complete -f -c brew -n "__fish_brew_command $cond" $argv
 end
 
-# testing outdated formulae completion
-complete -f -c brew -n '__fish_brew_command upgrade' \
-    -a '(__fish_brew_formulae_outdated)'
-
-# testing switch completion: first arg is a formula with multiple version
-complete -f -r -c brew -n '__fish_brew_command switch; and [ (count (__fish_brew_args)) = 1 ]' \
-    -a '(__fish_brew_formulae_multiple_versions)'
-
-# second arg is a list of versions for the formula (which is the previous arg)
-complete -f -r -c brew -n '__fish_brew_command switch; and [ (count (__fish_brew_args)) = 2 ]' \
-    -a '(__fish_brew_formula_versions (__fish_brew_args)[-1])'
-
 
 ##############
 ## COMMANDS ##
@@ -154,7 +146,7 @@ __complete_brew_arg 'cat' -a '(__fish_brew_formulae_all)'
 
 
 __complete_brew_cmd 'cleanup' 'Remove old installed versions'
-__complete_brew_arg 'cleanup' -a '(__fish_brew_installed_formulas)'
+__complete_brew_arg 'cleanup' -a '(__fish_brew_formulae_installed)'
 __complete_brew_arg 'cleanup'      -l prune   -d 'Remove all cache files older than given number of days' -a '(seq 1 5)'
 __complete_brew_arg 'cleanup' -s n -l dry-run -d 'Show what files would be removed'
 __complete_brew_arg 'cleanup' -s s            -d 'Scrub the cache, removing downloads for even the latest versions of formulae'
@@ -262,33 +254,33 @@ __complete_brew_arg 'info abv;
 
 __complete_brew_cmd 'install' 'Install formula'
 __complete_brew_arg 'install' -a '(__fish_brew_formulae_all)'
-
-__complete_brew_arg 'install' -s d -l debug -d 'If install fails, open shell in temp directory'
+# NOTE: upgrade command accepts same options as install
+__complete_brew_arg 'install upgrade' -s d -l debug -d 'If install fails, open shell in temp directory'
 # --env takes single obligatory argument:
-__complete_brew_arg 'install; and not __fish_brew_opt --env' -l env -d 'Specify build environment' -r -a '
+__complete_brew_arg 'install upgrade; and not __fish_brew_opt --env' -l env -d 'Specify build environment' -r -a '
     std\t"Use standard build environment"
     super\t"Use superenv"
 '
 # --ignore-dependencies and --only-dependencies are mutually exclusive:
-__complete_brew_arg 'install;
+__complete_brew_arg 'install upgrade;
     and not __fish_brew_opt --only-dependencies --ignore-dependencies
     ' -l ignore-dependencies -d 'Skip installing any dependencies of any kind'
-__complete_brew_arg 'install;
+__complete_brew_arg 'install upgrade;
     and not __fish_brew_opt --only-dependencies --ignore-dependencies
     ' -l only-dependencies   -d 'Install dependencies but not the formula itself'
-__complete_brew_arg 'install' -l cc -d 'Attempt to compile using the specified compiler' \
+__complete_brew_arg 'install upgrade' -l cc -d 'Attempt to compile using the specified compiler' \
     -a 'clang gcc-4.0 gcc-4.2 gcc-4.3 gcc-4.4 gcc-4.5 gcc-4.6 gcc-4.7 gcc-4.8 gcc-4.9 llvm-gcc'
 # --build-from-source and --force-bottle are mutually exclusive:
-__complete_brew_arg 'install; and not __fish_brew_opt --force-bottle'    -s s -l build-from-source -d 'Compile the formula from source'
+__complete_brew_arg 'install upgrade; and not __fish_brew_opt --force-bottle'    -s s -l build-from-source -d 'Compile the formula from source'
 # FIXME: -s misbehaves allowing --force-bottle
-__complete_brew_arg 'install; and not __fish_brew_opt -s --build-from-source' -l force-bottle      -d 'Install from a bottle if it exists'
+__complete_brew_arg 'install upgrade; and not __fish_brew_opt -s --build-from-source' -l force-bottle      -d 'Install from a bottle if it exists'
 # --HEAD and --devel are mutually exclusive:
-__complete_brew_arg 'install; and not __fish_brew_opt --HEAD'  -l devel -d 'Install the development version'
-__complete_brew_arg 'install; and not __fish_brew_opt --devel' -l HEAD  -d 'Install the HEAD version'
-__complete_brew_arg 'install'      -l keep-tmp     -d 'Keep temp files created during installation'
-__complete_brew_arg 'install'      -l build-bottle -d 'Prepare the formula for eventual bottling during installation'
-__complete_brew_arg 'install' -s i -l interactive  -d 'Download and patch formula, then open a shell'
-__complete_brew_arg 'install; and __fish_brew_opt -i --interactive' -s g -l git -d 'Create a Git repository for working on patches'
+__complete_brew_arg 'install upgrade; and not __fish_brew_opt --HEAD'  -l devel -d 'Install the development version'
+__complete_brew_arg 'install upgrade; and not __fish_brew_opt --devel' -l HEAD  -d 'Install the HEAD version'
+__complete_brew_arg 'install upgrade'      -l keep-tmp     -d 'Keep temp files created during installation'
+__complete_brew_arg 'install upgrade'      -l build-bottle -d 'Prepare the formula for eventual bottling during installation'
+__complete_brew_arg 'install upgrade' -s i -l interactive  -d 'Download and patch formula, then open a shell'
+__complete_brew_arg 'install upgrade; and __fish_brew_opt -i --interactive' -s g -l git -d 'Create a Git repository for working on patches'
 # fomrula installtion options are listed after the formula name:
 __complete_brew_arg 'install;
     and [ (count (__fish_brew_args)) -ge 2 ];
@@ -396,3 +388,87 @@ end
 
 __complete_brew_cmd 'sh' 'Start a Homebrew build environment shell'
 __complete_brew_arg 'sh' -l env=std -d 'Use standard PATH instead of superenv\'s'
+
+
+__complete_brew_cmd 'style' 'Check Homebrew style guidelines for formulae or files'
+# NOTE: is it OK to use (ls) for suggestions?
+__complete_brew_arg 'style' -a '(ls)'                             -d 'File'
+__complete_brew_arg 'style' -a '(__fish_brew_taps_installed)'               -d 'Tap'
+__complete_brew_arg 'style' -a '(__fish_brew_formulae_installed)' -d 'Formula'
+__complete_brew_arg 'style' -l fix -d 'Use RuboCop\'s --auto-correct feature'
+__complete_brew_arg 'style' -l display-cop-names -d 'Output RuboCop cop name for each violation'
+# --only-cops and --except-cops are mutually exclusive:
+__complete_brew_arg 'style; and not __fish_brew_opt --only-cops --except-cops' -l only-cops   -d 'Use only given Rubocop cops'
+__complete_brew_arg 'style; and not __fish_brew_opt --only-cops --except-cops' -l except-cops -d 'Skip given Rubocop cops'
+
+
+__complete_brew_cmd 'switch' 'Switch formula to another installed version'
+# first argument is a formula with multiple versions:
+__complete_brew_arg 'switch; and [ (count (__fish_brew_args)) = 1 ]' -a '(__fish_brew_formulae_multiple_versions)'
+# second argument is a list of versions for the previous argument:
+__complete_brew_arg 'switch; and [ (count (__fish_brew_args)) = 2 ]' -a '(__fish_brew_formula_versions (__fish_brew_args)[-1])'
+
+
+__complete_brew_cmd 'tap' 'List installed taps or install a new tap'
+__complete_brew_arg 'tap; and not __fish_brew_opts' -l full          -d 'Clone full repository instead of a shallow copy'
+__complete_brew_arg 'tap; and not __fish_brew_opts' -l repair        -d 'Migrate tapped formulae from symlink-based to directory-based structure'
+__complete_brew_arg 'tap; and not __fish_brew_opts' -l list-official -d 'List all official taps'
+__complete_brew_arg 'tap; and not __fish_brew_opts' -l list-pinned   -d 'List all pinned taps'
+
+
+__complete_brew_cmd 'tap-info' 'Display a brief summary of all installed taps'
+__complete_brew_arg 'tap-info; and not __fish_brew_opt --installed' -a '(__fish_brew_taps_installed)'
+__complete_brew_arg 'tap-info; and not __fish_brew_opt --installed' -l installed -d 'Display information on all installed taps'
+__complete_brew_arg 'tap-info; and not __fish_brew_opt --json=v1'   -l json=v1   -d 'Format output in JSON format'
+
+
+__complete_brew_cmd 'tap-pin' 'Prioritize tap\'s formulae over core'
+__complete_brew_arg 'tap-pin' -a '(__fish_brew_taps_installed)'
+
+
+__complete_brew_cmd 'tap-unpin' 'Don\'t prioritize tap\'s formulae over core anymore'
+__complete_brew_arg 'tap-unpin' -a '(__fish_brew_taps_pinned)'
+
+
+__complete_brew_cmd 'uninstall' 'Uninstall formula'
+__complete_brew_arg 'uninstall remove rm' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'uninstall remove rm' -s f -l force               -d 'Delete all installed versions'
+__complete_brew_arg 'uninstall remove rm'      -l ignore-dependencies -d 'Won\'t fail, even if dependent formulae would still be installed'
+
+
+__complete_brew_cmd 'unlink' 'Unlink formula'
+__complete_brew_arg 'unlink' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'unlink' -s n -l dry-run -d 'Show what files would be unlinked'
+
+
+__complete_brew_cmd 'unlinkapps' 'Remove symlinks created by brew linkapps (deprecated)'
+__complete_brew_arg 'unlinkapps' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'unlinkapps'      -l local   -d 'Remove symlinks from ~/Applications'
+__complete_brew_arg 'unlinkapps' -s n -l dry-run -d 'Show what symlinks would be removed'
+
+
+__complete_brew_cmd 'unpack' 'Unpack formulae source files into current/given directory'
+__complete_brew_arg 'unpack' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'unpack'      -l patch   -d 'Apply patches to the unpacked source'
+__complete_brew_arg 'unpack' -s g -l git     -d 'Initialize Git repository in the unpacked source'
+__complete_brew_arg 'unpack'      -l destdir -d 'Unpack into the given directory' -r -a '(__fish_complete_directories "" "")'
+
+
+__complete_brew_cmd 'unpin' 'Unpin formulae, allowing them to be upgraded'
+__complete_brew_arg 'unpin' -a '(__fish_brew_formulae_pinned)'
+
+
+__complete_brew_cmd 'untap' 'Remove a tapped repository'
+__complete_brew_arg 'untap' -a '(__fish_brew_taps_installed)'
+
+
+__complete_brew_cmd 'update' 'Fetch newest version of Homebrew and formulae'
+__complete_brew_arg 'update'      -l merge -d 'Use git merge (rather than git rebase)'
+__complete_brew_arg 'update' -s f -l force -d 'Always do a slower, full update check'
+
+
+__complete_brew_cmd 'upgrade' 'Upgrade outdated brews'
+__complete_brew_arg 'upgrade' -a '(__fish_brew_formulae_outdated)'
+__complete_brew_arg 'upgrade' -l cleanup -d 'Remove previously installed versions'
+__complete_brew_arg 'upgrade' -l fetch-HEAD -d 'Fetch the upstream repository to detect if the HEAD installation is outdated'
+__complete_brew_arg 'upgrade' -a '(complete -C"brew install -")'
