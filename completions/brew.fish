@@ -221,3 +221,22 @@ __complete_brew_arg 'help' -a '(__fish_brew_commands_list)'
 
 __complete_brew_cmd 'home' 'Open Homebrew/formula\'s homepage'
 __complete_brew_arg 'home' -a '(__fish_brew_formulae_all)'
+
+
+__complete_brew_cmd 'info' 'Display information about formula'
+# suggest formulae names only without --all/--installed options;
+__complete_brew_arg 'info abv; and not __fish_brew_opt --all --installed' -a '(__fish_brew_formulae_all)'
+# --github or --json are applicable only without other options
+__complete_brew_arg 'info abv; and not __fish_brew_opts' -l github  -d 'Open the GitHub History page for formula'
+__complete_brew_arg 'info abv; and not __fish_brew_opts' -l json=v1 -d 'Print a JSON representation of formulae'
+# --all and --installed require --json option and are mutually exclusive:
+__complete_brew_arg 'info abv;
+    and begin
+        __fish_brew_opt --json=v1;
+        and not __fish_brew_opt --installed --all
+    end' -l all       -d 'Display JSON info for all formulae'
+__complete_brew_arg 'info abv;
+    and begin
+        __fish_brew_opt --json=v1;
+        and not __fish_brew_opt --installed --all
+    end' -l installed -d 'Display JSON info for installed formulae'
