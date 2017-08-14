@@ -141,6 +141,13 @@ end
 ##############
 
 
+__complete_brew_cmd 'analytics' 'User behaviour analytics commands'
+__complete_brew_arg 'analytics; and [ (count (__fish_brew_args)) = 1 ]' -a state           -d 'Display analytics state'
+__complete_brew_arg 'analytics; and [ (count (__fish_brew_args)) = 1 ]' -a on              -d 'Turn on analytics'
+__complete_brew_arg 'analytics; and [ (count (__fish_brew_args)) = 1 ]' -a off             -d 'Turn off analytics'
+__complete_brew_arg 'analytics; and [ (count (__fish_brew_args)) = 1 ]' -a regenerate-uuid -d 'Regenerate UUID used in analytics'
+
+
 __complete_brew_cmd 'cat' 'Display the source to formula'
 __complete_brew_arg 'cat' -a '(__fish_brew_formulae_all)'
 
@@ -275,8 +282,8 @@ __complete_brew_arg 'install upgrade; and not __fish_brew_opt --force-bottle'   
 # FIXME: -s misbehaves allowing --force-bottle
 __complete_brew_arg 'install upgrade; and not __fish_brew_opt -s --build-from-source' -l force-bottle      -d 'Install from a bottle if it exists'
 # --HEAD and --devel are mutually exclusive:
-__complete_brew_arg 'install upgrade; and not __fish_brew_opt --HEAD'  -l devel -d 'Install the development version'
-__complete_brew_arg 'install upgrade; and not __fish_brew_opt --devel' -l HEAD  -d 'Install the HEAD version'
+__complete_brew_arg 'install upgrade; and not __fish_brew_opt --devel --HEAD' -l devel -d 'Install the development version'
+__complete_brew_arg 'install upgrade; and not __fish_brew_opt --devel --HEAD' -l HEAD  -d 'Install the HEAD version'
 __complete_brew_arg 'install upgrade'      -l keep-tmp     -d 'Keep temp files created during installation'
 __complete_brew_arg 'install upgrade'      -l build-bottle -d 'Prepare the formula for eventual bottling during installation'
 __complete_brew_arg 'install upgrade' -s i -l interactive  -d 'Download and patch formula, then open a shell'
@@ -472,3 +479,37 @@ __complete_brew_arg 'upgrade' -a '(__fish_brew_formulae_outdated)'
 __complete_brew_arg 'upgrade' -l cleanup -d 'Remove previously installed versions'
 __complete_brew_arg 'upgrade' -l fetch-HEAD -d 'Fetch the upstream repository to detect if the HEAD installation is outdated'
 __complete_brew_arg 'upgrade' -a '(complete -C"brew install -")'
+
+
+__complete_brew_cmd 'uses' 'Show formulas that depend on specified formula'
+__complete_brew_arg 'uses' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'uses' -l installed -d 'List only installed formulae'
+__complete_brew_arg 'uses' -l recursive -d 'Resolve more than one level of dependencies'
+__complete_brew_arg 'uses' -l include-build    -d 'Include the :build type dependencies'
+__complete_brew_arg 'uses' -l include-optional -d 'Include the :optional type dependencies'
+__complete_brew_arg 'uses' -l skip-recommended -d 'Skip :recommended  type  dependencies'
+# --HEAD and --devel are mutually exclusive:
+__complete_brew_arg 'uses; and not __fish_brew_opt --devel --HEAD' -l devel -d 'Find cases development builds using formulae'
+__complete_brew_arg 'uses; and not __fish_brew_opt --devel --HEAD' -l HEAD  -d 'Find cases HEAD builds using formulae'
+
+
+__complete_brew_cmd '--cache' 'Display Homebrew/formula\'s cache location'
+__complete_brew_arg '--cache' -a '(__fish_brew_formulae_all)'
+
+
+__complete_brew_cmd '--cellar' 'Display Homebrew/formula\'s Cellar path'
+__complete_brew_arg '--cellar' -a '(__fish_brew_formulae_all)'
+
+
+__complete_brew_cmd '--env' 'Summary of the Homebrew build environment'
+
+
+__complete_brew_cmd '--prefix' 'Display Homebrew/formula\'s install path'
+__complete_brew_arg '--prefix' -a '(__fish_brew_formulae_all)'
+
+
+__complete_brew_cmd '--repository' 'Display Homebrew/tap\'s .git directory location'
+__complete_brew_arg '--repository' -a '(__fish_brew_taps_installed)'
+
+
+__complete_brew_cmd '--version' 'Display Homebrew\'s version number'
