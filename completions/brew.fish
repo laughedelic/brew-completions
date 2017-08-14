@@ -400,7 +400,7 @@ __complete_brew_arg 'sh' -l env=std -d 'Use standard PATH instead of superenv\'s
 __complete_brew_cmd 'style' 'Check Homebrew style guidelines for formulae or files'
 # NOTE: is it OK to use (ls) for suggestions?
 __complete_brew_arg 'style' -a '(ls)'                             -d 'File'
-__complete_brew_arg 'style' -a '(__fish_brew_taps_installed)'               -d 'Tap'
+__complete_brew_arg 'style' -a '(__fish_brew_taps_installed)'     -d 'Tap'
 __complete_brew_arg 'style' -a '(__fish_brew_formulae_installed)' -d 'Formula'
 __complete_brew_arg 'style' -l fix -d 'Use RuboCop\'s --auto-correct feature'
 __complete_brew_arg 'style' -l display-cop-names -d 'Output RuboCop cop name for each violation'
@@ -513,3 +513,95 @@ __complete_brew_arg '--repository' -a '(__fish_brew_taps_installed)'
 
 
 __complete_brew_cmd '--version' 'Display Homebrew\'s version number'
+
+
+########################
+## DEVELOPER COMMANDS ##
+########################
+
+__complete_brew_cmd 'audit' 'Check formulae for Homebrew coding style violations'
+__complete_brew_arg 'audit' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'audit' -l strict            -d 'Run additional checks (including RuboCop style checks)'
+__complete_brew_arg 'audit' -l fix               -d 'Use RuboCop\'s --auto-correct feature'
+__complete_brew_arg 'audit' -l online            -d 'Run additional checks that require a network connection'
+__complete_brew_arg 'audit' -l new-formula       -d 'Check if a new formula is eligible for Homebrew'
+__complete_brew_arg 'audit' -l display-cop-names -d 'Output RuboCop cop name for each violation'
+__complete_brew_arg 'audit' -l display-filename  -d 'Prefix output lines with the file being audited'
+# --only and --except are mutually exclusive:
+# FIXME: not sure if these options can be repeated:
+__complete_brew_arg 'audit; and not __fish_brew_opt --only'   -l only   -d 'Use only given audit method'
+__complete_brew_arg 'audit; and not __fish_brew_opt --except' -l except -d 'Skip given audit method'
+# --only-cops and --except-cops are mutually exclusive:
+__complete_brew_arg 'audit; and not __fish_brew_opt --only-cops --except-cops' -l only-cops   -d 'Use only given Rubocop cops'
+__complete_brew_arg 'audit; and not __fish_brew_opt --only-cops --except-cops' -l except-cops -d 'Skip given Rubocop cops'
+
+
+__complete_brew_cmd 'bottle' 'Create a bottle (binary package)'
+# FIXME: should it suggest all/installed formulae or only files with a cetain name?
+__complete_brew_arg 'bottle' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'bottle; and not __fish_brew_opt --merge' -s v -l verbose -d 'Print the bottling commands and any warnings encountered'
+# --keep-old can be also used with --merged and is mutually exclusive with --no-rebuild
+__complete_brew_arg 'bottle; and not __fish_brew_opt --no-rebuild'       -l keep-old        -d 'Keep rebuild version at its original value'
+__complete_brew_arg 'bottle; and not __fish_brew_opt --merge --keep-old' -l no-rebuild      -d 'Remove rebuild version'
+__complete_brew_arg 'bottle; and not __fish_brew_opt --merge'            -l skip-relocation -d 'Skip check if the bottle can be marked as relocatable'
+__complete_brew_arg 'bottle; and not __fish_brew_opt --merge'            -l root-url        -d 'Specify the root of the bottle\'s URL instead of default' -r
+__complete_brew_arg 'bottle; and not __fish_brew_opt --merge'            -l force-core-tap  -d 'Build a bottle even if formula is not in any installed taps'
+# --merge is a separate mode of the bottle command:
+__complete_brew_arg 'bottle; and not __fish_brew_opt --merge' -l merge -d 'Generate a bottle and print the new DSL merged into the existing formula'
+__complete_brew_arg 'bottle; and __fish_brew_opt --merge' -l write     -d 'Write and commit the changes'
+# --no-commit depends on --write (which depends on --merge):
+__complete_brew_arg 'bottle; and __fish_brew_opt --write' -l no-commit -d 'Do not commit written changes'
+
+
+__complete_brew_cmd 'bump-formula-pr' 'Create a pull request to update formula with a new URL or tag'
+# FIXME: should it suggest all/installed formulae or only files with a cetain name?
+__complete_brew_arg 'bump-formula-pr' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'bump-formula-pr'      -l devel   -d 'Bump the development version instead of stable'
+__complete_brew_arg 'bump-formula-pr' -s n -l dry-run -d 'Show what would be done'
+# --write depends on --dry-run:
+__complete_brew_arg 'bump-formula-pr; and __fish_brew_opt -n --dry-run' -l write -d 'Write changes but not commit them'
+# --audit and --strict are mutually exclusive:
+__complete_brew_arg 'bump-formula-pr; and not __fish_brew_opt --audit --strict' -l audit  -d 'Run audit before opening a PR'
+__complete_brew_arg 'bump-formula-pr; and not __fish_brew_opt --audit --strict' -l strict -d 'Run audit --strict before opening a PR'
+__complete_brew_arg 'bump-formula-pr' -l mirror  -r -d 'Specify mirror URL'
+__complete_brew_arg 'bump-formula-pr' -l version -r -d 'Override the value parsed from the URL/tag'
+__complete_brew_arg 'bump-formula-pr' -l message -r -d 'Append message to the default PR text'
+# --url and --tag are mutually exclusive:
+__complete_brew_arg 'bump-formula-pr; and not __fish_brew_opt --url --tag --revision' -l url -r -d 'Specify the URL'
+__complete_brew_arg 'bump-formula-pr; and not __fish_brew_opt --url --tag --sha-256'  -l tag -r -d 'Specify the tag'
+# --sha-256 and --revision depend on --url and --tag correspondingly:
+__complete_brew_arg 'bump-formula-pr; and __fish_brew_opt --url' -l sha-256  -r -d 'Specify checksum of the new download'
+__complete_brew_arg 'bump-formula-pr; and __fish_brew_opt --tag' -l revision -r -d 'Specify revision corresponding to the tag'
+
+
+__complete_brew_cmd 'create' 'Create new formula from URL and open it in the editor'
+# all options have to be passed after the URL argument:
+# --autotools --cmake and --meson are mutually exclusive:
+__complete_brew_arg 'create; [ (count (__fish_brew_args)) -ge 2 ];
+    and not __fish_brew_opt --autotools --cmake --meson'           -l autotools      -d 'Use template for Autotools-style build'
+__complete_brew_arg 'create; [ (count (__fish_brew_args)) -ge 2 ];
+    and not __fish_brew_opt --autotools --cmake --meson'           -l cmake          -d 'Use template for CMake-style build'
+__complete_brew_arg 'create; [ (count (__fish_brew_args)) -ge 2 ];
+    and not __fish_brew_opt --autotools --cmake --meson'           -l meson          -d 'Use template for Meson-style build'
+__complete_brew_arg 'create; [ (count (__fish_brew_args)) -ge 2 ]' -l no-fetch       -d 'Don\'t download URL to the cache'
+__complete_brew_arg 'create; [ (count (__fish_brew_args)) -ge 2 ]' -l set-name    -r -d 'Set name explicitly'
+__complete_brew_arg 'create; [ (count (__fish_brew_args)) -ge 2 ]' -l set-version -r -d 'Set version explicitly'
+__complete_brew_arg 'create; [ (count (__fish_brew_args)) -ge 2 ]' -l tap         -r -d 'Specify tap for the generated formula'
+
+
+__complete_brew_cmd 'edit' 'Open Homebrew/formula for editing'
+__complete_brew_arg 'edit' -a '(__fish_brew_formulae_all)'
+
+
+__complete_brew_cmd 'formula' 'Display the path where formula is located'
+__complete_brew_arg 'formula' -a '(__fish_brew_formulae_all)'
+
+
+__complete_brew_cmd 'linkage' 'Check library links of an installed formula'
+__complete_brew_arg 'linkage' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'linkage' -l test    -d 'Only display missing libraries'
+__complete_brew_arg 'linkage' -l reverse -d 'Print the dylib followed by the binaries which link to it'
+
+
+__complete_brew_cmd 'man' 'Generate Homebrew\'s manpages'
+__complete_brew_arg 'man' -l fail-if-changed -d 'Fail if changes are detected in the manpage outputs'
