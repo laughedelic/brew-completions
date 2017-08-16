@@ -198,14 +198,14 @@ __complete_brew_arg 'deps' -l skip-recommended -d "Skip :recommended  type  depe
 __complete_brew_cmd 'desc' "Show formulae description or search by name and/or description"
 __complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -a '(__fish_brew_formulae_all)'
 # FIXME: -n behaves differently from everything else
-__complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -r -s n -l name        -d "Search only names"
-__complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -r -s d -l description -d "Search only descriptions"
-__complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -r -s s -l search      -d "Search names and descriptions"
+__complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -s n -l name        -r -d "Search only names"
+__complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -s d -l description -r -d "Search only descriptions"
+__complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -s s -l search      -r -d "Search names and descriptions"
 
 
 __complete_brew_cmd 'diy' "Determine installation prefix for non-brew software"
-__complete_brew_arg 'diy configure' -r -l 'name=name'       -d "Set name of package"
-__complete_brew_arg 'diy configure' -r -l 'version=version' -d "Set version of package"
+__complete_brew_arg 'diy configure' -l 'name=name'       -r -d "Set name of package"
+__complete_brew_arg 'diy configure' -l 'version=version' -r -d "Set version of package"
 
 
 __complete_brew_cmd 'doctor' "Check your system for potential problems"
@@ -264,7 +264,7 @@ __complete_brew_arg 'install' -a '(__fish_brew_formulae_all)'
 # NOTE: upgrade command accepts same options as install
 __complete_brew_arg 'install upgrade' -s d -l debug -d "If install fails, open shell in temp directory"
 # --env takes single obligatory argument:
-__complete_brew_arg 'install upgrade; and not __fish_brew_opt --env' -l env -d "Specify build environment" -r -a '
+__complete_brew_arg 'install upgrade; and not __fish_brew_opt --env' -l env -r -d "Specify build environment" -a '
     std\t"Use standard build environment"
     super\t"Use superenv"
 '
@@ -351,7 +351,7 @@ __complete_brew_arg 'migrate' -s f -l force -d "Treat installed and passed formu
 
 __complete_brew_cmd 'missing' "Check given formula (or all) for missing dependencies"
 __complete_brew_arg 'missing' -a '(__fish_brew_formulae_installed)'
-__complete_brew_arg 'missing' -l hide -d "Act as if it's not installed" -r -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'missing' -l hide -r -d "Act as if it's not installed" -a '(__fish_brew_formulae_installed)'
 
 
 __complete_brew_cmd 'options' "Display install options for formula"
@@ -544,7 +544,7 @@ __complete_brew_arg 'bottle; and not __fish_brew_opt --merge' -s v -l verbose -d
 __complete_brew_arg 'bottle; and not __fish_brew_opt --no-rebuild'       -l keep-old        -d "Keep rebuild version at its original value"
 __complete_brew_arg 'bottle; and not __fish_brew_opt --merge --keep-old' -l no-rebuild      -d "Remove rebuild version"
 __complete_brew_arg 'bottle; and not __fish_brew_opt --merge'            -l skip-relocation -d "Skip check if the bottle can be marked as relocatable"
-__complete_brew_arg 'bottle; and not __fish_brew_opt --merge'            -l root-url -r     -d "Specify the root of the bottle's URL instead of default"
+__complete_brew_arg 'bottle; and not __fish_brew_opt --merge'            -l root-url     -r -d "Specify the root of the bottle's URL instead of default"
 __complete_brew_arg 'bottle; and not __fish_brew_opt --merge'            -l force-core-tap  -d "Build a bottle even if formula is not in any installed taps"
 # --merge is a separate mode of the bottle command:
 __complete_brew_arg 'bottle; and not __fish_brew_opt --merge' -l merge -d "Generate a bottle and print the new DSL merged into the existing formula"
@@ -642,8 +642,8 @@ __complete_brew_arg 'tests' -s v -l verbose      -d "Print the command that runs
 __complete_brew_arg 'tests' -l coverage          -d "Also generate code coverage reports"
 __complete_brew_arg 'tests' -l generic           -d "Only run OS-agnostic tests"
 __complete_brew_arg 'tests' -l no-compat         -d "Don't load the compatibility layer"
-__complete_brew_arg 'tests' -l only -r           -d "Run only specified *_spec.rb"
-__complete_brew_arg 'tests' -l seed -r           -d "Randomize tests with the given seed"
+__complete_brew_arg 'tests' -l only           -r -d "Run only specified *_spec.rb"
+__complete_brew_arg 'tests' -l seed           -r -d "Randomize tests with the given seed"
 __complete_brew_arg 'tests' -l online            -d "Include tests that use the GitHub API"
 __complete_brew_arg 'tests' -l official-cmd-taps -d "Include tests that use any of the taps for official external commands"
 
