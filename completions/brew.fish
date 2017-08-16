@@ -213,14 +213,14 @@ __complete_brew_cmd 'doctor' 'Check your system for potential problems'
 
 __complete_brew_cmd 'fetch' 'Download source packages for given formulae'
 __complete_brew_arg 'fetch' -a '(__fish_brew_formulae_all)'
-__complete_brew_arg 'fetch' -s f -l force             -d 'Remove a previously cached version and re-fetch'
+__complete_brew_arg 'fetch' -s f -l force        -d 'Remove a previously cached version and re-fetch'
 __complete_brew_arg 'fetch' -l deps              -d 'Also download dependencies'
 __complete_brew_arg 'fetch' -l build-from-source -d 'Fetch source package instead of bottle'
-__complete_brew_arg 'fetch' -s v -l verbose                -d 'Do a verbose VCS checkout'
-__complete_brew_arg 'fetch' -l retry              -d 'Retry if a download fails or re-download if the checksum has changed'
+__complete_brew_arg 'fetch' -s v -l verbose      -d 'Do a verbose VCS checkout'
+__complete_brew_arg 'fetch' -l retry             -d 'Retry if a download fails or re-download if the checksum has changed'
 # --HEAD and --devel are mutually exclusive:
-__complete_brew_arg 'fetch; and not __fish_brew_opt --HEAD'  -l devel             -d 'Download the development version from a VCS'
-__complete_brew_arg 'fetch; and not __fish_brew_opt --devel' -l HEAD              -d 'Download the HEAD version from a VCS'
+__complete_brew_arg 'fetch; and not __fish_brew_opt --devel --HEAD' -l devel -d 'Download the development version from a VCS'
+__complete_brew_arg 'fetch; and not __fish_brew_opt --devel --HEAD' -l HEAD  -d 'Download the HEAD version from a VCS'
 # --build-from-source and --force-bottle are mutually exclusive:
 __complete_brew_arg 'fetch; and not __fish_brew_opt --force-bottle'    -s s -l build-from-source -d 'Download the source rather than a bottle'
 __complete_brew_arg 'fetch; and not __fish_brew_opt --build-from-source -s' -l force-bottle      -d 'Download a bottle if it exists'
@@ -577,16 +577,16 @@ __complete_brew_arg 'bump-formula-pr; and __fish_brew_opt --tag' -l revision -r 
 __complete_brew_cmd 'create' 'Create new formula from URL and open it in the editor'
 # all options have to be passed after the URL argument:
 # --autotools --cmake and --meson are mutually exclusive:
-__complete_brew_arg 'create; [ (count (__fish_brew_args)) -ge 2 ];
+__complete_brew_arg 'create; and [ (count (__fish_brew_args)) -ge 2 ];
     and not __fish_brew_opt --autotools --cmake --meson'           -l autotools      -d 'Use template for Autotools-style build'
-__complete_brew_arg 'create; [ (count (__fish_brew_args)) -ge 2 ];
+__complete_brew_arg 'create; and [ (count (__fish_brew_args)) -ge 2 ];
     and not __fish_brew_opt --autotools --cmake --meson'           -l cmake          -d 'Use template for CMake-style build'
-__complete_brew_arg 'create; [ (count (__fish_brew_args)) -ge 2 ];
+__complete_brew_arg 'create; and [ (count (__fish_brew_args)) -ge 2 ];
     and not __fish_brew_opt --autotools --cmake --meson'           -l meson          -d 'Use template for Meson-style build'
-__complete_brew_arg 'create; [ (count (__fish_brew_args)) -ge 2 ]' -l no-fetch       -d 'Don\'t download URL to the cache'
-__complete_brew_arg 'create; [ (count (__fish_brew_args)) -ge 2 ]' -l set-name    -r -d 'Set name explicitly'
-__complete_brew_arg 'create; [ (count (__fish_brew_args)) -ge 2 ]' -l set-version -r -d 'Set version explicitly'
-__complete_brew_arg 'create; [ (count (__fish_brew_args)) -ge 2 ]' -l tap         -r -d 'Specify tap for the generated formula'
+__complete_brew_arg 'create; and [ (count (__fish_brew_args)) -ge 2 ]' -l no-fetch       -d 'Don\'t download URL to the cache'
+__complete_brew_arg 'create; and [ (count (__fish_brew_args)) -ge 2 ]' -l set-name    -r -d 'Set name explicitly'
+__complete_brew_arg 'create; and [ (count (__fish_brew_args)) -ge 2 ]' -l set-version -r -d 'Set version explicitly'
+__complete_brew_arg 'create; and [ (count (__fish_brew_args)) -ge 2 ]' -l tap         -r -d 'Specify tap for the generated formula'
 
 
 __complete_brew_cmd 'edit' 'Open Homebrew/formula for editing'
@@ -605,3 +605,51 @@ __complete_brew_arg 'linkage' -l reverse -d 'Print the dylib followed by the bin
 
 __complete_brew_cmd 'man' 'Generate Homebrew\'s manpages'
 __complete_brew_arg 'man' -l fail-if-changed -d 'Fail if changes are detected in the manpage outputs'
+
+
+# TODO: it could use Ruby to autocomplete Github PRs from homebrew/core (patch-source arg)
+__complete_brew_cmd 'pull' 'Apply a patch from GitHub to Homebrew'
+__complete_brew_arg 'pull' -l bottle                  -d 'Pull the bottle-update commit and publish files on Bintray'
+__complete_brew_arg 'pull' -l bump                    -d 'For one-formula PRs, reword commit message to the preferred format'
+__complete_brew_arg 'pull' -l clean                   -d 'Don\'t rewrite or modify commits in the pulled PR'
+__complete_brew_arg 'pull' -l ignore-whitespace       -d 'Silently ignore whitespace discrepancies when applying diffs'
+__complete_brew_arg 'pull' -l resolve                 -d 'Manually resolve patch application failures (instead of aborting)'
+__complete_brew_arg 'pull' -l branch-okay             -d 'Don\'t warn if pulling to a branch besides master'
+__complete_brew_arg 'pull' -l no-pbcopy               -d 'Don\'t copy anything to the system clipboard'
+__complete_brew_arg 'pull' -l no-publish              -d 'Don\'t publish bottles to Bintray'
+__complete_brew_arg 'pull' -l warn-on-publish-failure -d 'Don\'t exit if there\'s a failure publishing bottles on Bintray'
+
+
+__complete_brew_cmd 'release-notes' 'List merged PRs on Homebrew/brew between two Git refs'
+__complete_brew_arg 'release-notes' -l markdown -d 'Output as a Markdown list'
+# TODO: suggest Git tags as arguments
+
+
+__complete_brew_cmd 'tap-new' 'Generate template files for a new tap'
+
+
+__complete_brew_cmd 'test' 'Run tests for given formula'
+__complete_brew_arg 'test' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'test' -s d -l debug -d 'Test with an interative debugger'
+__complete_brew_arg 'test' -l keep-tmp -d 'Don\'t delete temp files created for the test'
+# --HEAD and --devel are mutually exclusive:
+__complete_brew_arg 'test; and not __fish_brew_opt --devel --HEAD' -l devel -d 'Test the development version'
+__complete_brew_arg 'test; and not __fish_brew_opt --devel --HEAD' -l HEAD  -d 'Test the HEAD version'
+
+
+__complete_brew_cmd 'tests' 'Run Homebrew\'s unit and integration tests'
+__complete_brew_arg 'tests' -s v -l verbose      -d 'Print the command that runs the tests'
+__complete_brew_arg 'tests' -l coverage          -d 'Also generate code coverage reports'
+__complete_brew_arg 'tests' -l generic           -d 'Only run OS-agnostic tests'
+__complete_brew_arg 'tests' -l no-compat         -d 'Don\'t load the compatibility layer'
+__complete_brew_arg 'tests' -l only -r           -d 'Run only specified *_spec.rb'
+__complete_brew_arg 'tests' -l seed -r           -d 'Randomize tests with the given seed'
+__complete_brew_arg 'tests' -l online            -d 'Include tests that use the GitHub API'
+__complete_brew_arg 'tests' -l official-cmd-taps -d 'Include tests that use any of the taps for official external commands'
+
+
+__complete_brew_cmd 'update-test' 'Run a test of brew update with a new repository clone'
+__complete_brew_arg 'update-test' -l commit -r -d 'Specify start commit (instead of default origin/master)'
+__complete_brew_arg 'update-test' -l before -r -d 'Specify date of the start commit'
+__complete_brew_arg 'update-test' -l to-tag    -d 'Set HOMEBREW_UPDATE_TO_TAG to test updating between tags'
+__complete_brew_arg 'update-test' -l keep-tmp  -d 'Keep the temp directory with the new repository clone'
