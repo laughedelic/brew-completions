@@ -48,7 +48,7 @@ function __fish_brew_subcommand -a cmd -d "Helps matching the second argument of
 
     __fish_brew_command $cmd
     and set -q args[2]
-    and set -l sub $argv[2]
+    and set -l sub $args[2]
     or return 1
 
     set -e argv[1]
