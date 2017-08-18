@@ -653,3 +653,34 @@ __complete_brew_arg 'update-test' -l commit -r -d "Specify start commit (instead
 __complete_brew_arg 'update-test' -l before -r -d "Specify date of the start commit"
 __complete_brew_arg 'update-test' -l to-tag    -d "Set HOMEBREW_UPDATE_TO_TAG to test updating between tags"
 __complete_brew_arg 'update-test' -l keep-tmp  -d "Keep the temp directory with the new repository clone"
+
+
+#########################
+## ADDITIONAL COMMANDS ##
+#########################
+# These commands are not in the manpage, but bew lists them in brew commands
+# NOTE: I'm not even sure if these commands should be listed
+
+
+# FIXME: I don't have aspell installed, is it a part of the core homebrew?
+__complete_brew_cmd 'aspell-dictionaries' "Generate new dictionaries for the aspell formula"
+
+
+__complete_brew_cmd 'mirror' "Reupload stable URL for a formula to Bintray to use as a mirror"
+# FIXME: should it suggest all/installed formulae or only files with a cetain name?
+__complete_brew_arg 'mirror' -a '(__fish_brew_formulae_all)'
+# TODO: find description for the test option
+__complete_brew_arg 'mirror' -l test # -d ???
+
+
+__complete_brew_cmd 'readall' "Import all formulae in core/given tap"
+__complete_brew_arg 'readall' -a '(__fish_brew_taps_installed)'
+
+
+# NOTE: update-report: The Ruby implementation of brew update. Never called manually.
+
+
+__complete_brew_cmd 'update-reset' "Fetches and resets Homebrew and all taps to their latest origin/master"
+
+
+__complete_brew_cmd 'vendor-install' "Install vendor version of Homebrew dependencies"
