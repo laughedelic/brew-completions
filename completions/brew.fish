@@ -1,5 +1,13 @@
 # Fish shell completions for Homebrew
 
+# A note about aliases:
+#
+# * When defining completions for the (sub)commands themselves, only the full names are used, as they
+#   are more descriptive and worth completing. Aliases are usually shorter than the full names, and
+#   exist exactly to save time for users who already know what they want and are going to type the
+#   command anyway (i.e. without completion).
+# * Nevertheless, it's important to support aliases in the completions for their arguments/options.
+
 ##########################
 ## COMMAND LINE PARSING ##
 ##########################
@@ -216,6 +224,7 @@ __complete_brew_arg 'commands; and __fish_brew_opt --quiet' \
 
 
 __complete_brew_cmd 'config' "Show Homebrew and system configuration for debugging"
+# alias: --config
 
 
 __complete_brew_cmd 'deps' "Show dependencies for given formulae"
@@ -255,6 +264,7 @@ __complete_brew_arg 'diy configure' -l 'version=version' -r -d "Set version of p
 
 
 __complete_brew_cmd 'doctor' "Check your system for potential problems"
+# alias: dr
 
 
 __complete_brew_cmd 'fetch' "Download source packages for given formulae"
@@ -283,7 +293,7 @@ __complete_brew_arg 'help' -a '(__fish_brew_commands_list)'
 
 
 __complete_brew_cmd 'home' "Open Homebrew/formula's homepage"
-__complete_brew_arg 'home' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'home homepage' -a '(__fish_brew_formulae_all)'
 
 
 __complete_brew_cmd 'info' "Display information about formula"
@@ -306,6 +316,7 @@ __complete_brew_arg 'info abv;
 
 
 __complete_brew_cmd 'install' "Install formula"
+# FIXME: install has a weird alias instal (with single l), probably it should also be supported
 __complete_brew_arg 'install' -a '(__fish_brew_formulae_all)'
 # NOTE: upgrade command accepts same options as install
 __complete_brew_arg 'install upgrade' -s d -l debug -d "If install fails, open shell in temp directory"
@@ -484,6 +495,7 @@ __complete_brew_arg 'tap-unpin' -a '(__fish_brew_taps_pinned)'
 
 
 __complete_brew_cmd 'uninstall' "Uninstall formula"
+# FIXME: uninstall has a weird alias uninstal (with single l), probably it should also be supported
 __complete_brew_arg 'uninstall remove rm' -a '(__fish_brew_formulae_installed)'
 __complete_brew_arg 'uninstall remove rm' -s f -l force               -d "Delete all installed versions"
 __complete_brew_arg 'uninstall remove rm'      -l ignore-dependencies -d "Won't fail, even if dependent formulae would still be installed"
@@ -516,8 +528,8 @@ __complete_brew_arg 'untap' -a '(__fish_brew_taps_installed)'
 
 
 __complete_brew_cmd 'update' "Fetch newest version of Homebrew and formulae"
-__complete_brew_arg 'update'      -l merge -d "Use git merge (rather than git rebase)"
-__complete_brew_arg 'update' -s f -l force -d "Always do a slower, full update check"
+__complete_brew_arg 'update up'      -l merge -d "Use git merge (rather than git rebase)"
+__complete_brew_arg 'update up' -s f -l force -d "Always do a slower, full update check"
 
 
 __complete_brew_cmd 'upgrade' "Upgrade outdated brews"
@@ -547,7 +559,9 @@ __complete_brew_cmd '--cellar' "Display Homebrew/formula's Cellar path"
 __complete_brew_arg '--cellar' -a '(__fish_brew_formulae_all)'
 
 
-__complete_brew_cmd '--env' "Summary of the Homebrew build environment"
+__complete_brew_cmd 'environment' "Summary of the Homebrew build environment"
+# alias: --env
+# NOTE: manpage lists --env and environment is just an alias, but I prefer to use full names in autocomplete
 
 
 __complete_brew_cmd '--prefix' "Display Homebrew/formula's install path"
@@ -555,7 +569,7 @@ __complete_brew_arg '--prefix' -a '(__fish_brew_formulae_all)'
 
 
 __complete_brew_cmd '--repository' "Display Homebrew/tap's .git directory location"
-__complete_brew_arg '--repository' -a '(__fish_brew_taps_installed)'
+__complete_brew_arg '--repository --repo' -a '(__fish_brew_taps_installed)'
 
 
 __complete_brew_cmd '--version' "Display Homebrew's version number"
