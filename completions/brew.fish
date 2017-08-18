@@ -754,7 +754,31 @@ __complete_brew_cmd 'vendor-install' "Install vendor version of Homebrew depende
 ##############
 ### BUNDLE ###
 
-__complete_brew_cmd 'bundle' "Bundler for non-Ruby dependencies from Homebrew"
+__complete_brew_cmd 'bundle' "Install or upgrade all dependencies in a Brewfile"
+__complete_brew_arg 'bundle; and [ (count (__fish_brew_args)) = 1 ]' -s v -l verbose -d "Print more details"
+
+# --file/--global option is available for bundle command and all its subcommands except exec
+__complete_brew_arg 'bundle;
+        and not __fish_brew_subcommand bundle exec;
+        and not __fish_brew_opt --file --global
+    ' -l file -r -d "Specify Brewfile"
+__complete_brew_arg 'bundle;
+        and not __fish_brew_subcommand bundle exec;
+        and not __fish_brew_opt --file --global
+    ' -l global  -d "Use \$HOME/.Brewfile"
+
+__complete_brew_sub_cmd 'bundle' 'dump'    "Write all installed casks/formulae/taps into a Brewfile"
+__complete_brew_sub_cmd 'bundle' 'cleanup' "Uninstall all dependencies not listed in a Brewfile"
+__complete_brew_sub_cmd 'bundle' 'check'   "Check if all dependencies are installed in a Brewfile"
+__complete_brew_sub_cmd 'bundle' 'exec'    "Run an external command in an isolated build environment"
+
+# --force is available only for the dump/cleanup subcommands
+__complete_brew_sub_arg 'bundle' 'dump cleanup' -l force -d "Uninstall dependencies or overwrite an existing Brewfile"
+
+# --no-upgrade is available for bundle command and its check subcommand
+__complete_brew_arg 'bundle; and [ (count (__fish_brew_args)) = 1 ];
+        or __fish_brew_subcommand bundle check
+    ' -l no-upgrade -d "Don't run brew upgrade for outdated dependencies"
 
 
 ############
