@@ -25,14 +25,32 @@ end
 # * `__fish_brew_command list ls` returns true when brew command is _either_ `list` _or_ `ls`
 #
 function __fish_brew_command -d "Helps matching the first argument of brew"
-    set cmds (__fish_brew_args)
-    set -q cmds[1]; or return 1
+    set args (__fish_brew_args)
+    set -q args[1]; or return 1
 
     if count $argv
-        contains -- $cmds[1] $argv
+        contains -- $args[1] $argv
     else
-        echo $cmds[1]
+        echo $args[1]
     end
+end
+
+function __fish_brew_subcommand -a cmd -d "Helps matching the second argument of brew"
+    set args (__fish_brew_args)
+    # set -q args[1..2]
+    #     and set -q $cmd
+    #     and [ "$args[1]" = "$cmd" ]
+    #     or return 1
+    # set -e argv[1]
+    #
+    # if count $argv
+    #     contains -- $args[2] $argv
+    # else
+    #     echo $args[2]
+    # end
+    __fish_brew_command $cmd
+    and set -q args[2]
+    and contains -- $args[2] $argv[2..-1]
 end
 
 # This can be used to match any given options agains the given list of arguments:
@@ -119,6 +137,14 @@ function __fish_brew_commands_list -d "Lists all commands names, including alias
     brew commands --quiet --include-aliases
 end
 
+# TODO: any better way to list available services?
+function __fish_complete_brew_services -d "Lists available services"
+    set -l list (brew services list)
+    set -e list[1] # Header
+    for line in $list
+        echo (string split ' ' $line)[1]
+    end
+end
 
 ##########################
 ## COMPLETION SHORTCUTS ##
@@ -135,6 +161,17 @@ function __complete_brew_arg -a cond -d "A shortcut for defining arguments compl
     complete -f -c brew -n "__fish_brew_command $cond" $argv
 end
 
+function __complete_brew_sub_cmd -a cmd sub -d "A shortcut for defining brew subcommands completions"
+    set -e argv[1..2]
+    __complete_brew_arg "$cmd; and [ (count (__fish_brew_args)) = 1 ]" -a $sub -d $argv
+end
+
+function __complete_brew_sub_arg -a cmd sub -d "A shortcut for defining brew subcommand arguments completions"
+    set -e argv[1..2]
+    # NOTE: $sub can be just a name of a subcommand (or several) or additionally any other condition
+    complete -f -c brew -n "__fish_brew_subcommand $cmd $sub" $argv
+end
+
 
 ##############
 ## COMMANDS ##
@@ -142,10 +179,10 @@ end
 
 
 __complete_brew_cmd 'analytics' "User behaviour analytics commands"
-__complete_brew_arg 'analytics; and [ (count (__fish_brew_args)) = 1 ]' -a state           -d "Display analytics state"
-__complete_brew_arg 'analytics; and [ (count (__fish_brew_args)) = 1 ]' -a on              -d "Turn on analytics"
-__complete_brew_arg 'analytics; and [ (count (__fish_brew_args)) = 1 ]' -a off             -d "Turn off analytics"
-__complete_brew_arg 'analytics; and [ (count (__fish_brew_args)) = 1 ]' -a regenerate-uuid -d "Regenerate UUID used in analytics"
+__complete_brew_sub_cmd 'analytics' 'state'           "Display analytics state"
+__complete_brew_sub_cmd 'analytics' 'on'              "Turn on analytics"
+__complete_brew_sub_cmd 'analytics' 'off'             "Turn off analytics"
+__complete_brew_sub_cmd 'analytics' 'regenerate-uuid' "Regenerate UUID used in analytics"
 
 
 __complete_brew_cmd 'cat' "Display the source to formula"
@@ -684,3 +721,37 @@ __complete_brew_cmd 'update-reset' "Fetches and resets Homebrew and all taps to 
 
 
 __complete_brew_cmd 'vendor-install' "Install vendor version of Homebrew dependencies"
+
+
+################################
+## OFFICIAL EXTERNAL COMMANDS ##
+################################
+# TODO: These commands are installed/tapped separately, so they should be completed only when present
+
+##############
+### BUNDLE ###
+
+__complete_brew_cmd 'bundle' "Bundler for non-Ruby dependencies from Homebrew"
+
+
+############
+### CASK ###
+
+__complete_brew_cmd 'cask' "Install macOS applications distributed as binaries"
+
+
+################
+### SERVICES ###
+
+__complete_brew_cmd 'services' "Integrates Homebrew formulae with macOS's launchctl manager"
+__complete_brew_arg 'services; and [ (count (__fish_brew_args)) = 1 ]' -s v -l verbose -d "Print more details"
+
+__complete_brew_sub_cmd 'services' 'list'    "List all running services for the current user"
+__complete_brew_sub_cmd 'services' 'run'     "Run service without starting at login/boot"
+__complete_brew_sub_cmd 'services' 'start'   "Start service immediately and register it to launch at login/boot"
+__complete_brew_sub_cmd 'services' 'stop'    "Stop service immediately and unregister it from launching at login/boot"
+__complete_brew_sub_cmd 'services' 'restart' "Stop and start service immediately and register it to launch at login/boot"
+__complete_brew_sub_cmd 'services' 'cleanup' "Remove all unused services"
+
+__complete_brew_sub_arg 'services' 'run start stop restart' -l all -d "Run all available services"
+__complete_brew_sub_arg 'services' 'run start stop restart' -a '(__fish_complete_brew_services)'
