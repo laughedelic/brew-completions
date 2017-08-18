@@ -37,20 +37,18 @@ end
 
 function __fish_brew_subcommand -a cmd -d "Helps matching the second argument of brew"
     set args (__fish_brew_args)
-    # set -q args[1..2]
-    #     and set -q $cmd
-    #     and [ "$args[1]" = "$cmd" ]
-    #     or return 1
-    # set -e argv[1]
-    #
-    # if count $argv
-    #     contains -- $args[2] $argv
-    # else
-    #     echo $args[2]
-    # end
+
     __fish_brew_command $cmd
     and set -q args[2]
-    and contains -- $args[2] $argv[2..-1]
+    and set -l sub $argv[2]
+    or return 1
+
+    set -e argv[1]
+    if count $argv
+        contains -- $sub $argv
+    else
+        echo $sub
+    end
 end
 
 # This can be used to match any given options agains the given list of arguments:
@@ -145,6 +143,17 @@ function __fish_complete_brew_services -d "Lists available services"
         echo (string split ' ' $line)[1]
     end
 end
+
+function __fish_complete_brew_casks_installed -d "Lists installed casks"
+    brew cask list -1 ^/dev/null
+end
+
+function __fish_complete_brew_casks_all -d "Lists available casks"
+    # FIXME: this works only online: (so we fallback to the list of installed casks)
+    brew cask search ^/dev/null
+    or __fish_complete_brew_casks_installed
+end
+
 
 ##########################
 ## COMPLETION SHORTCUTS ##
@@ -738,6 +747,58 @@ __complete_brew_cmd 'bundle' "Bundler for non-Ruby dependencies from Homebrew"
 ### CASK ###
 
 __complete_brew_cmd 'cask' "Install macOS applications distributed as binaries"
+
+__complete_brew_sub_cmd 'cask' '--version' "Display the Homebrew-Cask version"
+
+__complete_brew_sub_cmd 'cask' 'audit'     "Verify installability of Casks"
+
+__complete_brew_sub_cmd 'cask' 'cat'       "Dump raw source of the given Cask to the standard output"
+
+__complete_brew_sub_cmd 'cask' 'cleanup'   "Clean up cached downloads and tracker symlinks"
+__complete_brew_sub_arg 'cask' 'cleanup' -l outdated -d "Only clean up cached downloads older than 10 days"
+
+__complete_brew_sub_cmd 'cask' 'create'    "Create the given Cask and open it in an editor"
+
+__complete_brew_sub_cmd 'cask' 'doctor'    "Check for configuration issues"
+
+__complete_brew_sub_cmd 'cask' 'edit'      "Edit the given Cask"
+
+__complete_brew_sub_cmd 'cask' 'fetch'     "Download remote application files to local cache"
+__complete_brew_sub_arg 'cask' 'fetch' -l force -d "Redownload even if the files are already cached"
+
+__complete_brew_sub_cmd 'cask' 'home'      "Open the homepage of the given Cask"
+
+__complete_brew_sub_cmd 'cask' 'info'      "Display information about the given Cask"
+
+__complete_brew_sub_cmd 'cask' 'install'   "Install the given Cask"
+__complete_brew_sub_arg 'cask' 'install' -l force          -d "Reinstall even if the Cask is already present"
+__complete_brew_sub_arg 'cask' 'install' -l skip-cask-deps -d "Skip any Cask dependencies"
+__complete_brew_sub_arg 'cask' 'install' -l require-sha    -d "Abort if the Cask doesn't define a checksum"
+
+__complete_brew_sub_cmd 'cask' 'list'      "List installed Casks or staged files of the given installed Casks"
+__complete_brew_sub_arg 'cask' 'list ls' -s 1        -d "Format output in a single column"
+__complete_brew_sub_arg 'cask' 'list ls' -l versions -d "Show all installed versions"
+
+__complete_brew_sub_cmd 'cask' 'outdated'  "List the outdated installed Casks"
+__complete_brew_sub_arg 'cask' 'outdated' -l greedy -d "Include the Casks having auto_updates true or version :latest"
+__complete_brew_sub_arg 'cask' 'outdated; and not __fish_brew_opt --verbose --quiet' -l verbose -d "Display outdated and the latest version"
+__complete_brew_sub_arg 'cask' 'outdated; and not __fish_brew_opt --verbose --quiet' -l quiet   -d "Suppress versions from the output"
+
+__complete_brew_sub_cmd 'cask' 'reinstall' "Reinstall the given Cask"
+
+__complete_brew_sub_cmd 'cask' 'search'    "Searche all known Casks"
+
+__complete_brew_sub_cmd 'cask' 'style'     "Check Cask style using RuboCop"
+__complete_brew_sub_arg 'cask' 'style' -l fix -d "Auto-correct any style errors if possible"
+
+__complete_brew_sub_cmd 'cask' 'uninstall' "Uninstall the given Cask"
+__complete_brew_sub_arg 'cask' 'uninstall remove rm' -l force -d "Uninstall even if the Cask is not present"
+
+__complete_brew_sub_cmd 'cask' 'zap'       "Zap all files associated with the given Cask"
+
+# Common argument for these commands: either all available or only installed cask tokens:
+__complete_brew_sub_arg 'cask' 'audit cat edit fetch home homepage info abv install style' -a '(__fish_complete_brew_casks_all)'
+__complete_brew_sub_arg 'cask' 'list ls reinstall outdated uninstall remove rm zap'        -a '(__fish_complete_brew_casks_installed)'
 
 
 ################
