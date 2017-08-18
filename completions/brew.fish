@@ -81,23 +81,23 @@ end
 ######################
 ## SUGGESTION LISTS ##
 ######################
+# These functions return lists of suggestions for arguments completion
 
-# These functions return lists of completed arguments
-function __fish_brew_formulae_all
+function __suggest_brew_formulae_all
     brew search
 end
 
-function __fish_brew_formulae_installed
+function __suggest_brew_formulae_installed
     brew list
 end
 
-function __fish_brew_formulae_pinned
+function __suggest_brew_formulae_pinned
     brew list --pinned --versions \
         # replace first space with tab to make the following a description in the completions list:
         | string replace -r '\s' '\t'
 end
 
-function __fish_brew_formulae_multiple_versions -d "List of installed formulae with their multiple versions"
+function __suggest_brew_formulae_multiple_versions -d "List of installed formulae with their multiple versions"
     brew list --versions --multiple \
         # replace first space with tab to make the following a description in the completions list:
         | string replace -r '\s' '\t' \
@@ -105,7 +105,7 @@ function __fish_brew_formulae_multiple_versions -d "List of installed formulae w
         | string replace --all ' ' ', '
 end
 
-function __fish_brew_formula_versions -a formula -d "List of versions for a given formula"
+function __suggest_brew_formula_versions -a formula -d "List of versions for a given formula"
     brew list --versions $formula \
         # cut off the first word in the output which is the formula name
         | string replace -r '\S+\s+' '' \
@@ -113,7 +113,7 @@ function __fish_brew_formula_versions -a formula -d "List of versions for a give
         | string split ' '
 end
 
-function __fish_brew_formula_options -a formula -d "List installation options for a given formula"
+function __suggest_brew_formula_options -a formula -d "List installation options for a given formula"
     function list_pairs
         set -q argv[2]; or return 0
         echo $argv[1]\t$argv[2]
@@ -125,26 +125,26 @@ function __fish_brew_formula_options -a formula -d "List installation options fo
     list_pairs (brew options $formula | string trim)
 end
 
-function __fish_brew_formulae_outdated -d "List of outdated formulae with the information about potential upgrade"
+function __suggest_brew_formulae_outdated -d "List of outdated formulae with the information about potential upgrade"
     brew outdated --verbose \
         # replace first space with tab to make the following a description in the completions list:
         | string replace -r '\s' '\t'
 end
 
-function __fish_brew_taps_installed -d "List all available taps"
+function __suggest_brew_taps_installed -d "List all available taps"
     brew tap
 end
 
-function __fish_brew_taps_pinned -d "List only pinned taps"
+function __suggest_brew_taps_pinned -d "List only pinned taps"
     brew tap --list-pinned
 end
 
-function __fish_brew_commands_list -d "Lists all commands names, including aliases"
+function __suggest_brew_commands -d "Lists all commands names, including aliases"
     brew commands --quiet --include-aliases
 end
 
 # TODO: any better way to list available services?
-function __fish_complete_brew_services -d "Lists available services"
+function __suggest_brew_services -d "Lists available services"
     set -l list (brew services list)
     set -e list[1] # Header
     for line in $list
@@ -152,14 +152,14 @@ function __fish_complete_brew_services -d "Lists available services"
     end
 end
 
-function __fish_complete_brew_casks_installed -d "Lists installed casks"
+function __suggest_brew_casks_installed -d "Lists installed casks"
     brew cask list -1 ^/dev/null
 end
 
-function __fish_complete_brew_casks_all -d "Lists available casks"
+function __suggest_brew_casks_all -d "Lists available casks"
     # FIXME: this works only online: (so we fallback to the list of installed casks)
     brew cask search ^/dev/null
-    or __fish_complete_brew_casks_installed
+    or __suggest_brew_casks_installed
 end
 
 
@@ -203,18 +203,18 @@ __complete_brew_sub_cmd 'analytics' 'regenerate-uuid' "Regenerate UUID used in a
 
 
 __complete_brew_cmd 'cat' "Display the source to formula"
-__complete_brew_arg 'cat' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'cat' -a '(__suggest_brew_formulae_all)'
 
 
 __complete_brew_cmd 'cleanup' "Remove old installed versions"
-__complete_brew_arg 'cleanup' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'cleanup' -a '(__suggest_brew_formulae_installed)'
 __complete_brew_arg 'cleanup'      -l prune   -d "Remove all cache files older than given number of days" -a '(seq 1 5)'
 __complete_brew_arg 'cleanup' -s n -l dry-run -d "Show what files would be removed"
 __complete_brew_arg 'cleanup' -s s            -d "Scrub the cache, removing downloads for even the latest versions of formulae"
 
 
 __complete_brew_cmd 'command' "Display the path to command file"
-__complete_brew_arg 'command' -a '__fish_brew_commands_list'
+__complete_brew_arg 'command' -a '__suggest_brew_commands'
 
 
 __complete_brew_cmd 'commands' "List built-in and external commands"
@@ -229,7 +229,7 @@ __complete_brew_cmd 'config' "Show Homebrew and system configuration for debuggi
 
 __complete_brew_cmd 'deps' "Show dependencies for given formulae"
 # accepts formulae argument only without --all or --installed options:
-__complete_brew_arg 'deps; and not __fish_brew_opt --all --installed' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'deps; and not __fish_brew_opt --all --installed' -a '(__suggest_brew_formulae_all)'
 # options that work only without --tree:
 __complete_brew_arg 'deps; and not __fish_brew_opt --tree' -s n         -d "Show in topological order"
 __complete_brew_arg 'deps; and not __fish_brew_opt --tree' -l 1         -d "Show only 1 level down"
@@ -251,7 +251,7 @@ __complete_brew_arg 'deps' -l skip-recommended -d "Skip :recommended  type  depe
 
 
 __complete_brew_cmd 'desc' "Show formulae description or search by name and/or description"
-__complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -a '(__suggest_brew_formulae_all)'
 # FIXME: -n behaves differently from everything else
 __complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -s n -l name        -r -d "Search only names"
 __complete_brew_arg 'desc; and [ (count (__fish_brew_args)) = 1 ]' -s d -l description -r -d "Search only descriptions"
@@ -268,7 +268,7 @@ __complete_brew_cmd 'doctor' "Check your system for potential problems"
 
 
 __complete_brew_cmd 'fetch' "Download source packages for given formulae"
-__complete_brew_arg 'fetch' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'fetch' -a '(__suggest_brew_formulae_all)'
 __complete_brew_arg 'fetch' -s f -l force        -d "Remove a previously cached version and re-fetch"
 __complete_brew_arg 'fetch' -l deps              -d "Also download dependencies"
 __complete_brew_arg 'fetch' -l build-from-source -d "Fetch source package instead of bottle"
@@ -283,22 +283,22 @@ __complete_brew_arg 'fetch; and not __fish_brew_opt --build-from-source -s' -l f
 
 
 __complete_brew_cmd 'gist-logs' "Upload logs for a failed build of formula to a new Gist"
-__complete_brew_arg 'gist-logs' -a '(__fish_brew_formulae_all)'
-__complete_brew_arg 'gist-logs' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'gist-logs' -a '(__suggest_brew_formulae_all)'
+__complete_brew_arg 'gist-logs' -a '(__suggest_brew_formulae_all)'
 __complete_brew_arg 'gist-logs' -s n -l new-issue -d "Also create a new issue in the appropriate GitHub repository"
 
 
 __complete_brew_cmd 'help' "Display help for given command"
-__complete_brew_arg 'help' -a '(__fish_brew_commands_list)'
+__complete_brew_arg 'help' -a '(__suggest_brew_commands)'
 
 
 __complete_brew_cmd 'home' "Open Homebrew/formula's homepage"
-__complete_brew_arg 'home homepage' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'home homepage' -a '(__suggest_brew_formulae_all)'
 
 
 __complete_brew_cmd 'info' "Display information about formula"
 # suggest formulae names only without --all/--installed options;
-__complete_brew_arg 'info abv; and not __fish_brew_opt --all --installed' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'info abv; and not __fish_brew_opt --all --installed' -a '(__suggest_brew_formulae_all)'
 # --github or --json are applicable only without other options
 __complete_brew_arg 'info abv; and not __fish_brew_opts' -l github  -d "Open the GitHub History page for formula"
 __complete_brew_arg 'info abv; and not __fish_brew_opts' -l json=v1 -d "Print a JSON representation of formulae"
@@ -317,7 +317,7 @@ __complete_brew_arg 'info abv;
 
 __complete_brew_cmd 'install' "Install formula"
 # FIXME: install has a weird alias instal (with single l), probably it should also be supported
-__complete_brew_arg 'install' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'install' -a '(__suggest_brew_formulae_all)'
 # NOTE: upgrade command accepts same options as install
 __complete_brew_arg 'install upgrade' -s d -l debug -d "If install fails, open shell in temp directory"
 # --env takes single obligatory argument:
@@ -349,7 +349,7 @@ __complete_brew_arg 'install upgrade; and __fish_brew_opt -i --interactive' -s g
 __complete_brew_arg 'install;
     and [ (count (__fish_brew_args)) -ge 2 ];
     and not string match --quiet -- "-*" (__fish_brew_args)[-1]
-    ' -a '(__fish_brew_formula_options (__fish_brew_args)[-1])'
+    ' -a '(__suggest_brew_formula_options (__fish_brew_args)[-1])'
 
 
 __complete_brew_cmd 'irb' "Enter the interactive Homebrew Ruby shell"
@@ -360,19 +360,19 @@ __complete_brew_cmd 'leaves' "Installed formulae that are not dependencies of an
 
 
 __complete_brew_cmd 'link' "Symlink installed formula files"
-__complete_brew_arg 'link ln' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'link ln' -a '(__suggest_brew_formulae_installed)'
 __complete_brew_arg 'link ln'      -l overwrite -d "Overwrite existing files"
 __complete_brew_arg 'link ln' -s n -l dry-run   -d "Show what files would be linked or overwritten"
 __complete_brew_arg 'link ln' -s f -l force     -d "Allow keg-only formulae to be linked"
 
 
 __complete_brew_cmd 'linkapps' "Symlink .app bundles into /Applications (deprecated)"
-__complete_brew_arg 'linkapps' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'linkapps' -a '(__suggest_brew_formulae_installed)'
 __complete_brew_arg 'linkapps' -l local -d "Link into ~/Applications instead"
 
 
 __complete_brew_cmd 'list' "List installed formulae"
-__complete_brew_arg 'list ls' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'list ls' -a '(__suggest_brew_formulae_installed)'
 # --full-name or --unbrewed exclude any other arguments or options
 __complete_brew_arg 'list ls; and [ (count (__fish_brew_args)) = 1 ]' -l full-name -d "Print formulae with fully-qualified names"
 __complete_brew_arg 'list ls; and [ (count (__fish_brew_args)) = 1 ]' -l unbrewed  -d "List all files in the Homebrew prefix not installed by brew"
@@ -397,22 +397,22 @@ __complete_brew_arg 'list ls;
 
 
 __complete_brew_cmd 'log' "Show git log for formula"
-__complete_brew_arg 'log' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'log' -a '(__suggest_brew_formulae_all)'
 
 
 __complete_brew_cmd 'migrate' "Migrate renamed packages to new name"
 # NOTE: should this work only with installed formulae?
-__complete_brew_arg 'migrate' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'migrate' -a '(__suggest_brew_formulae_all)'
 __complete_brew_arg 'migrate' -s f -l force -d "Treat installed and passed formulae like if they are from same taps and migrate them anyway"
 
 
 __complete_brew_cmd 'missing' "Check given formula (or all) for missing dependencies"
-__complete_brew_arg 'missing' -a '(__fish_brew_formulae_installed)'
-__complete_brew_arg 'missing' -l hide -r -d "Act as if it's not installed" -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'missing' -a '(__suggest_brew_formulae_installed)'
+__complete_brew_arg 'missing' -l hide -r -d "Act as if it's not installed" -a '(__suggest_brew_formulae_installed)'
 
 
 __complete_brew_cmd 'options' "Display install options for formula"
-__complete_brew_arg 'options; and not __fish_brew_opt --installed --all' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'options; and not __fish_brew_opt --installed --all' -a '(__suggest_brew_formulae_all)'
 __complete_brew_arg 'options; and not __fish_brew_opt --installed --all' -l all       -d "Show options for all formulae"
 __complete_brew_arg 'options; and not __fish_brew_opt --installed --all' -l installed -d "Show options for all installed formulae"
 __complete_brew_arg 'options' -l compact -d "Show options as a space-delimited list"
@@ -428,11 +428,11 @@ __complete_brew_arg 'outdated' -l fetch-HEAD -d "Fetch the upstream repository t
 
 # TODO: should suggest only unpinned formulae and show their current versions in the description
 __complete_brew_cmd 'pin' "Pin the specified formulae to their current versions"
-__complete_brew_arg 'pin' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'pin' -a '(__suggest_brew_formulae_installed)'
 
 
 __complete_brew_cmd 'postinstall' "Rerun the post-install steps for formula"
-__complete_brew_arg 'postinstall' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'postinstall' -a '(__suggest_brew_formulae_installed)'
 
 
 __complete_brew_cmd 'prune' "Remove dead symlinks"
@@ -440,7 +440,7 @@ __complete_brew_arg 'prune' -s n -l dry-run -d "Show what files would be removed
 
 
 __complete_brew_cmd 'reinstall' "Uninstall and then install again"
-__complete_brew_arg 'reinstall' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'reinstall' -a '(__suggest_brew_formulae_installed)'
 
 
 __complete_brew_cmd 'search' "Display all locally available formulae or search by name/description"
@@ -457,8 +457,8 @@ __complete_brew_arg 'sh' -l env=std -d "Use standard PATH instead of superenv's"
 __complete_brew_cmd 'style' "Check Homebrew style guidelines for formulae or files"
 # NOTE: is it OK to use (ls) for suggestions?
 __complete_brew_arg 'style' -a '(ls)'                             -d "File"
-__complete_brew_arg 'style' -a '(__fish_brew_taps_installed)'     -d "Tap"
-__complete_brew_arg 'style' -a '(__fish_brew_formulae_installed)' -d "Formula"
+__complete_brew_arg 'style' -a '(__suggest_brew_taps_installed)'     -d "Tap"
+__complete_brew_arg 'style' -a '(__suggest_brew_formulae_installed)' -d "Formula"
 __complete_brew_arg 'style' -l fix -d "Use RuboCop's --auto-correct feature"
 __complete_brew_arg 'style' -l display-cop-names -d "Output RuboCop cop name for each violation"
 # --only-cops and --except-cops are mutually exclusive:
@@ -468,9 +468,9 @@ __complete_brew_arg 'style; and not __fish_brew_opt --only-cops --except-cops' -
 
 __complete_brew_cmd 'switch' "Switch formula to another installed version"
 # first argument is a formula with multiple versions:
-__complete_brew_arg 'switch; and [ (count (__fish_brew_args)) = 1 ]' -a '(__fish_brew_formulae_multiple_versions)'
+__complete_brew_arg 'switch; and [ (count (__fish_brew_args)) = 1 ]' -a '(__suggest_brew_formulae_multiple_versions)'
 # second argument is a list of versions for the previous argument:
-__complete_brew_arg 'switch; and [ (count (__fish_brew_args)) = 2 ]' -a '(__fish_brew_formula_versions (__fish_brew_args)[-1])'
+__complete_brew_arg 'switch; and [ (count (__fish_brew_args)) = 2 ]' -a '(__suggest_brew_formula_versions (__fish_brew_args)[-1])'
 
 
 __complete_brew_cmd 'tap' "List installed taps or install a new tap"
@@ -481,50 +481,50 @@ __complete_brew_arg 'tap; and not __fish_brew_opts' -l list-pinned   -d "List al
 
 
 __complete_brew_cmd 'tap-info' "Display a brief summary of all installed taps"
-__complete_brew_arg 'tap-info; and not __fish_brew_opt --installed' -a '(__fish_brew_taps_installed)'
+__complete_brew_arg 'tap-info; and not __fish_brew_opt --installed' -a '(__suggest_brew_taps_installed)'
 __complete_brew_arg 'tap-info; and not __fish_brew_opt --installed' -l installed -d "Display information on all installed taps"
 __complete_brew_arg 'tap-info; and not __fish_brew_opt --json=v1'   -l json=v1   -d "Format output in JSON format"
 
 
 __complete_brew_cmd 'tap-pin' "Prioritize tap's formulae over core"
-__complete_brew_arg 'tap-pin' -a '(__fish_brew_taps_installed)'
+__complete_brew_arg 'tap-pin' -a '(__suggest_brew_taps_installed)'
 
 
 __complete_brew_cmd 'tap-unpin' "Don't prioritize tap's formulae over core anymore"
-__complete_brew_arg 'tap-unpin' -a '(__fish_brew_taps_pinned)'
+__complete_brew_arg 'tap-unpin' -a '(__suggest_brew_taps_pinned)'
 
 
 __complete_brew_cmd 'uninstall' "Uninstall formula"
 # FIXME: uninstall has a weird alias uninstal (with single l), probably it should also be supported
-__complete_brew_arg 'uninstall remove rm' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'uninstall remove rm' -a '(__suggest_brew_formulae_installed)'
 __complete_brew_arg 'uninstall remove rm' -s f -l force               -d "Delete all installed versions"
 __complete_brew_arg 'uninstall remove rm'      -l ignore-dependencies -d "Won't fail, even if dependent formulae would still be installed"
 
 
 __complete_brew_cmd 'unlink' "Unlink formula"
-__complete_brew_arg 'unlink' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'unlink' -a '(__suggest_brew_formulae_installed)'
 __complete_brew_arg 'unlink' -s n -l dry-run -d "Show what files would be unlinked"
 
 
 __complete_brew_cmd 'unlinkapps' "Remove symlinks created by brew linkapps (deprecated)"
-__complete_brew_arg 'unlinkapps' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'unlinkapps' -a '(__suggest_brew_formulae_installed)'
 __complete_brew_arg 'unlinkapps'      -l local   -d "Remove symlinks from ~/Applications"
 __complete_brew_arg 'unlinkapps' -s n -l dry-run -d "Show what symlinks would be removed"
 
 
 __complete_brew_cmd 'unpack' "Unpack formulae source files into current/given directory"
-__complete_brew_arg 'unpack' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'unpack' -a '(__suggest_brew_formulae_all)'
 __complete_brew_arg 'unpack'      -l patch      -d "Apply patches to the unpacked source"
 __complete_brew_arg 'unpack' -s g -l git        -d "Initialize Git repository in the unpacked source"
 __complete_brew_arg 'unpack'      -l destdir -r -d "Unpack into the given directory" -a '(__fish_complete_directories "" "")'
 
 
 __complete_brew_cmd 'unpin' "Unpin formulae, allowing them to be upgraded"
-__complete_brew_arg 'unpin' -a '(__fish_brew_formulae_pinned)'
+__complete_brew_arg 'unpin' -a '(__suggest_brew_formulae_pinned)'
 
 
 __complete_brew_cmd 'untap' "Remove a tapped repository"
-__complete_brew_arg 'untap' -a '(__fish_brew_taps_installed)'
+__complete_brew_arg 'untap' -a '(__suggest_brew_taps_installed)'
 
 
 __complete_brew_cmd 'update' "Fetch newest version of Homebrew and formulae"
@@ -533,14 +533,14 @@ __complete_brew_arg 'update up' -s f -l force -d "Always do a slower, full updat
 
 
 __complete_brew_cmd 'upgrade' "Upgrade outdated brews"
-__complete_brew_arg 'upgrade' -a '(__fish_brew_formulae_outdated)'
+__complete_brew_arg 'upgrade' -a '(__suggest_brew_formulae_outdated)'
 __complete_brew_arg 'upgrade' -l cleanup -d "Remove previously installed versions"
 __complete_brew_arg 'upgrade' -l fetch-HEAD -d "Fetch the upstream repository to detect if the HEAD installation is outdated"
 # __complete_brew_arg 'upgrade' -a '(complete -C"brew install -")'
 
 
 __complete_brew_cmd 'uses' "Show formulas that depend on specified formula"
-__complete_brew_arg 'uses' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'uses' -a '(__suggest_brew_formulae_all)'
 __complete_brew_arg 'uses' -l installed -d "List only installed formulae"
 __complete_brew_arg 'uses' -l recursive -d "Resolve more than one level of dependencies"
 __complete_brew_arg 'uses' -l include-build    -d "Include the :build type dependencies"
@@ -552,11 +552,11 @@ __complete_brew_arg 'uses; and not __fish_brew_opt --devel --HEAD' -l HEAD  -d "
 
 
 __complete_brew_cmd '--cache' "Display Homebrew/formula's cache location"
-__complete_brew_arg '--cache' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg '--cache' -a '(__suggest_brew_formulae_all)'
 
 
 __complete_brew_cmd '--cellar' "Display Homebrew/formula's Cellar path"
-__complete_brew_arg '--cellar' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg '--cellar' -a '(__suggest_brew_formulae_all)'
 
 
 __complete_brew_cmd 'environment' "Summary of the Homebrew build environment"
@@ -565,11 +565,11 @@ __complete_brew_cmd 'environment' "Summary of the Homebrew build environment"
 
 
 __complete_brew_cmd '--prefix' "Display Homebrew/formula's install path"
-__complete_brew_arg '--prefix' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg '--prefix' -a '(__suggest_brew_formulae_all)'
 
 
 __complete_brew_cmd '--repository' "Display Homebrew/tap's .git directory location"
-__complete_brew_arg '--repository --repo' -a '(__fish_brew_taps_installed)'
+__complete_brew_arg '--repository --repo' -a '(__suggest_brew_taps_installed)'
 
 
 __complete_brew_cmd '--version' "Display Homebrew's version number"
@@ -580,7 +580,7 @@ __complete_brew_cmd '--version' "Display Homebrew's version number"
 ########################
 
 __complete_brew_cmd 'audit' "Check formulae for Homebrew coding style violations"
-__complete_brew_arg 'audit' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'audit' -a '(__suggest_brew_formulae_all)'
 __complete_brew_arg 'audit' -l strict            -d "Run additional checks (including RuboCop style checks)"
 __complete_brew_arg 'audit' -l fix               -d "Use RuboCop's --auto-correct feature"
 __complete_brew_arg 'audit' -l online            -d "Run additional checks that require a network connection"
@@ -598,7 +598,7 @@ __complete_brew_arg 'audit; and not __fish_brew_opt --only-cops --except-cops' -
 
 __complete_brew_cmd 'bottle' "Create a bottle (binary package)"
 # FIXME: should it suggest all/installed formulae or only files with a cetain name?
-__complete_brew_arg 'bottle' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'bottle' -a '(__suggest_brew_formulae_all)'
 __complete_brew_arg 'bottle; and not __fish_brew_opt --merge' -s v -l verbose -d "Print the bottling commands and any warnings encountered"
 # --keep-old can be also used with --merged and is mutually exclusive with --no-rebuild
 __complete_brew_arg 'bottle; and not __fish_brew_opt --no-rebuild'       -l keep-old        -d "Keep rebuild version at its original value"
@@ -615,7 +615,7 @@ __complete_brew_arg 'bottle; and __fish_brew_opt --write' -l no-commit -d "Do no
 
 __complete_brew_cmd 'bump-formula-pr' "Create a pull request to update formula with a new URL or tag"
 # FIXME: should it suggest all/installed formulae or only files with a cetain name?
-__complete_brew_arg 'bump-formula-pr' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'bump-formula-pr' -a '(__suggest_brew_formulae_all)'
 __complete_brew_arg 'bump-formula-pr'      -l devel   -d "Bump the development version instead of stable"
 __complete_brew_arg 'bump-formula-pr' -s n -l dry-run -d "Show what would be done"
 # --write depends on --dry-run:
@@ -650,15 +650,15 @@ __complete_brew_arg 'create; and [ (count (__fish_brew_args)) -ge 2 ]' -l tap   
 
 
 __complete_brew_cmd 'edit' "Open Homebrew/formula for editing"
-__complete_brew_arg 'edit' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'edit' -a '(__suggest_brew_formulae_all)'
 
 
 __complete_brew_cmd 'formula' "Display the path where formula is located"
-__complete_brew_arg 'formula' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'formula' -a '(__suggest_brew_formulae_all)'
 
 
 __complete_brew_cmd 'linkage' "Check library links of an installed formula"
-__complete_brew_arg 'linkage' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'linkage' -a '(__suggest_brew_formulae_installed)'
 __complete_brew_arg 'linkage' -l test    -d "Only display missing libraries"
 __complete_brew_arg 'linkage' -l reverse -d "Print the dylib followed by the binaries which link to it"
 
@@ -689,7 +689,7 @@ __complete_brew_cmd 'tap-new' "Generate template files for a new tap"
 
 
 __complete_brew_cmd 'test' "Run tests for given formula"
-__complete_brew_arg 'test' -a '(__fish_brew_formulae_installed)'
+__complete_brew_arg 'test' -a '(__suggest_brew_formulae_installed)'
 __complete_brew_arg 'test' -s d -l debug    -d "Test with an interative debugger"
 __complete_brew_arg 'test'      -l keep-tmp -d "Don't delete temp files created for the test"
 # --HEAD and --devel are mutually exclusive:
@@ -728,13 +728,13 @@ __complete_brew_cmd 'aspell-dictionaries' "Generate new dictionaries for the asp
 
 __complete_brew_cmd 'mirror' "Reupload stable URL for a formula to Bintray to use as a mirror"
 # FIXME: should it suggest all/installed formulae or only files with a cetain name?
-__complete_brew_arg 'mirror' -a '(__fish_brew_formulae_all)'
+__complete_brew_arg 'mirror' -a '(__suggest_brew_formulae_all)'
 # TODO: find description for the test option
 __complete_brew_arg 'mirror' -l test # -d ???
 
 
 __complete_brew_cmd 'readall' "Import all formulae in core/given tap"
-__complete_brew_arg 'readall' -a '(__fish_brew_taps_installed)'
+__complete_brew_arg 'readall' -a '(__suggest_brew_taps_installed)'
 
 
 # NOTE: update-report: The Ruby implementation of brew update. Never called manually.
@@ -811,8 +811,8 @@ __complete_brew_sub_arg 'cask' 'uninstall remove rm' -l force -d "Uninstall even
 __complete_brew_sub_cmd 'cask' 'zap'       "Zap all files associated with the given Cask"
 
 # Common argument for these commands: either all available or only installed cask tokens:
-__complete_brew_sub_arg 'cask' 'audit cat edit fetch home homepage info abv install style' -a '(__fish_complete_brew_casks_all)'
-__complete_brew_sub_arg 'cask' 'list ls reinstall outdated uninstall remove rm zap'        -a '(__fish_complete_brew_casks_installed)'
+__complete_brew_sub_arg 'cask' 'audit cat edit fetch home homepage info abv install style' -a '(__suggest_brew_casks_all)'
+__complete_brew_sub_arg 'cask' 'list ls reinstall outdated uninstall remove rm zap'        -a '(__suggest_brew_casks_installed)'
 
 
 ################
@@ -829,4 +829,4 @@ __complete_brew_sub_cmd 'services' 'restart' "Stop and start service immediately
 __complete_brew_sub_cmd 'services' 'cleanup' "Remove all unused services"
 
 __complete_brew_sub_arg 'services' 'run start stop restart' -l all -d "Run all available services"
-__complete_brew_sub_arg 'services' 'run start stop restart' -a '(__fish_complete_brew_services)'
+__complete_brew_sub_arg 'services' 'run start stop restart' -a '(__suggest_brew_services)'
