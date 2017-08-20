@@ -1,9 +1,8 @@
 # 🍺 [Homebrew] 🐟 [Fish shell] completions
 
-[![](https://img.shields.io/badge/fish--shell-2.6+-blue.svg)](https://github.com/fish-shell/fish-shell/releases)
+[![](https://img.shields.io/github/release/laughedelic/brew-completions.svg)](https://github.com/laughedelic/brew-completions/releases/latest)
 [![](https://img.shields.io/badge/license-LGPLv3-blue.svg)](https://www.tldrlegal.com/l/lgpl-3.0)
-[![](http://github-release-version.herokuapp.com/github/laughedelic/brew-completions/release.svg)](https://github.com/laughedelic/brew-completions/releases/latest)
-[![](https://img.shields.io/badge/contact-gitter_chat-dd1054.svg)][gitter]
+[![](https://img.shields.io/badge/chat-gitter-dd1054.svg)][gitter]
 
 [Fish shell] completions for [Homebrew].
 
