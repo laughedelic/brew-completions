@@ -1,11 +1,11 @@
-# [🍺 Homebrew][Homebrew] [🐟 Fish shell][fish] completions
+# 🍺 [Homebrew] 🐟 [Fish shell] completions
 
 [![](https://img.shields.io/badge/fish--shell-2.6+-blue.svg)](https://github.com/fish-shell/fish-shell/releases)
 [![](https://img.shields.io/badge/license-LGPLv3-blue.svg)](https://www.tldrlegal.com/l/lgpl-3.0)
 [![](http://github-release-version.herokuapp.com/github/laughedelic/brew-completions/release.svg)](https://github.com/laughedelic/brew-completions/releases/latest)
 [![](https://img.shields.io/badge/contact-gitter_chat-dd1054.svg)][gitter]
 
-[Fish shell][fish] completions for [Homebrew].
+[Fish shell] completions for [Homebrew].
 
 Fish includes some basic completions for brew, but a lot of commands and options are missing/outdated. So this work is aiming to fill the gap and provide a **comprehensive Homebrew completions plugin**. It supports
 
@@ -40,7 +40,12 @@ For now you can install it with either Fish plugin manager (you can also install
   omf install https://github.com/laughedelic/brew-completions
   ```
 
+* Using [fin](https://github.com/fisherman/fin):
+  ```fish
+  echo laughedelic/brew-completions >> ~/.config/fish/fishfile; and fin
+  ```
 
-[fish]: https://github.com/fish-shell/fish-shell
+
+[Fish shell]: https://github.com/fish-shell/fish-shell
 [Homebrew]: https://brew.sh/
 [gitter]: https://gitter.im/laughedelic/brew-completions
