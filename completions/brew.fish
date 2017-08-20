@@ -84,7 +84,11 @@ end
 # These functions return lists of suggestions for arguments completion
 
 function __suggest_brew_formulae_all
-    brew search
+    ruby -e "require('json');
+        JSON.parse(File.read('all.json'))
+            .each{|obj| puts([obj['name'], obj['desc']].reject(&:nil?).join(\"\t\"))}
+        "
+    # brew search
 end
 
 function __suggest_brew_formulae_installed
@@ -98,19 +102,29 @@ function __suggest_brew_formulae_pinned
 end
 
 function __suggest_brew_formulae_multiple_versions -d "List of installed formulae with their multiple versions"
-    brew list --versions --multiple \
-        # replace first space with tab to make the following a description in the completions list:
-        | string replace -r '\s' '\t' \
-        # a more visible versions separator:
-        | string replace --all ' ' ', '
+    ruby -e "require('json');
+        JSON.parse(File.read('installed.json'))
+            .select{|obj| obj['installed'].length > 1}
+            .each{|obj| puts(obj['name'] +\"\t\"+ obj['installed'].map{|obj| obj['version']}.join('; '))}
+        "
+    # brew list --versions --multiple \
+    #     # replace first space with tab to make the following a description in the completions list:
+    #     | string replace -r '\s' '\t' \
+    #     # a more visible versions separator:
+    #     | string replace --all ' ' ', '
 end
 
 function __suggest_brew_formula_versions -a formula -d "List of versions for a given formula"
-    brew list --versions $formula \
-        # cut off the first word in the output which is the formula name
-        | string replace -r '\S+\s+' '' \
-        # make it a list
-        | string split ' '
+    ruby -e "require('json');
+        JSON.parse(File.read('installed.json'))
+            .select{|obj| obj['name'] == '$formula'}
+            .each{|obj| puts(obj['installed'].map{|obj| obj['version']})}
+        "
+    # brew list --versions $formula \
+    #     # cut off the first word in the output which is the formula name
+    #     | string replace -r '\S+\s+' '' \
+    #     # make it a list
+    #     | string split ' '
 end
 
 function __suggest_brew_formula_options -a formula -d "List installation options for a given formula"
