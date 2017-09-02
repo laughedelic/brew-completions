@@ -83,8 +83,20 @@ end
 ######################
 # These functions return lists of suggestions for arguments completion
 
-function __suggest_brew_formulae_all
-    brew search
+function __ruby_parse_json -a file parser -d 'Parses given JSON file with Ruby'
+    # parser is any chain of methods to call on the parsed JSON
+    ruby -e "require('json'); JSON.parse(File.read('$file'))$parser"
+end
+
+function __suggest_brew_formulae_all -d 'Lists all available formulae with their descriptions'
+    # store the brew cache path in a var (because calling (brew --cache) is slow)
+    set -q __brew_cache_path
+    or set -gx __brew_cache_path (brew --cache)
+
+    __ruby_parse_json "$__brew_cache_path/desc_cache.json" \
+        '.each{ |k, v| puts([k, v].reject(&:nil?).join("\t")) }'
+    # backup: (note that it lists only formulae names without descriptions)
+    or brew search
 end
 
 function __suggest_brew_formulae_installed
@@ -98,6 +110,20 @@ function __suggest_brew_formulae_pinned
 end
 
 function __suggest_brew_formulae_multiple_versions -d "List of installed formulae with their multiple versions"
+    # NOTE: this assumes having `brew info --json=v1 --installed` cached
+    # __ruby_parse_json 'installed.json' "
+    #     .select{ |obj| obj['installed'].length > 1 }
+    #     .each{ |obj| puts(
+    #         obj['name'] +\"\t\"+
+    #         obj['installed']
+    #             .map{ |obj| obj['version'] }
+    #             .join('; ')
+    #     ) }
+    # "
+
+    # NOTE: this is bad because it's slower than calling `brew list --versions --multiple` and doesn't use any cache:
+    # brew ruby -e 'Formula.installed.map{ |f| puts (f.full_name + "\t" + f.installed_kegs.map{ |keg| keg.version.to_s }.join(" ")) }'
+
     brew list --versions --multiple \
         # replace first space with tab to make the following a description in the completions list:
         | string replace -r '\s' '\t' \
@@ -106,6 +132,12 @@ function __suggest_brew_formulae_multiple_versions -d "List of installed formula
 end
 
 function __suggest_brew_formula_versions -a formula -d "List of versions for a given formula"
+    # NOTE: this assumes having `brew info --json=v1 --installed` cached
+    # __ruby_parse_json 'installed.json' "
+    #     .select{ |obj| obj['name'] == '$formula' }
+    #     .each{ |obj| puts(obj['installed'].map{ |obj| obj['version'] }) }
+    # "
+
     brew list --versions $formula \
         # cut off the first word in the output which is the formula name
         | string replace -r '\S+\s+' '' \
@@ -153,13 +185,11 @@ function __suggest_brew_services -d "Lists available services"
 end
 
 function __suggest_brew_casks_installed -d "Lists installed casks"
-    brew cask list -1 ^/dev/null
+    brew cask list -1
 end
 
-function __suggest_brew_casks_all -d "Lists available casks"
-    # FIXME: this works only online: (so we fallback to the list of installed casks)
-    brew cask search ^/dev/null
-    or __suggest_brew_casks_installed
+function __suggest_brew_casks_all -d "Lists locally available casks"
+    brew cask search
 end
 
 
