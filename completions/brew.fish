@@ -93,10 +93,13 @@ function __suggest_brew_formulae_all -d 'Lists all available formulae with their
     set -q __brew_cache_path
     or set -gx __brew_cache_path (brew --cache)
 
-    __ruby_parse_json "$__brew_cache_path/desc_cache.json" \
-        '.each{ |k, v| puts([k, v].reject(&:nil?).join("\t")) }'
-    # backup: (note that it lists only formulae names without descriptions)
-    or brew search
+    if test -f "$__brew_cache_path/desc_cache.json"
+        __ruby_parse_json "$__brew_cache_path/desc_cache.json" \
+            '.each{ |k, v| puts([k, v].reject(&:nil?).join("\t")) }'
+        # backup: (note that it lists only formulae names without descriptions)
+    else
+        brew search
+    end
 end
 
 function __suggest_brew_formulae_installed
