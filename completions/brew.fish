@@ -192,7 +192,7 @@ function __suggest_brew_casks_installed -d "Lists installed casks"
 end
 
 function __suggest_brew_casks_all -d "Lists locally available casks"
-    brew cask search
+    brew search --casks
 end
 
 
@@ -478,6 +478,7 @@ __complete_brew_arg 'reinstall' -a '(__suggest_brew_formulae_installed)'
 
 __complete_brew_cmd 'search' "Display all locally available formulae or search by name/description"
 __complete_brew_arg 'search -S; and not __fish_brew_opts' -l desc -d "Search also in descriptions"
+__complete_brew_arg 'search -S; and not __fish_brew_opts' -l casks -d "Display all locally available casks"
 for repo in debian fedora fink macports opensuse ubuntu
     __complete_brew_arg "search -S; and not __fish_brew_opts" -l $repo -d "Search only in this repository"
 end
