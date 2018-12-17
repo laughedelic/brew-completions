@@ -29,9 +29,9 @@ For now you can install it with either Fish plugin manager (you can also install
 
 ## Install
 
-* Using [fisherman](https://github.com/fisherman/fisherman):
+* Using [fisher](https://github.com/jorgebucaran/fisher):
   ```fish
-  fisher install laughedelic/brew-completions
+  fisher add laughedelic/brew-completions
   ```
 
 * Using [oh-my-fish](https://github.com/oh-my-fish/oh-my-fish):
