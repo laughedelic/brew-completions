@@ -191,6 +191,12 @@ function __suggest_brew_casks_installed -d "Lists installed casks"
     brew cask list -1
 end
 
+function __suggest_brew_casks_outdated -d "Lists outdated casks with the information about potential upgrade"
+    brew cask outdated --verbose \
+        # replace first space with tab to make the following a description in the completions list:
+        | string replace -r '\s' '\t'
+end
+
 function __suggest_brew_casks_all -d "Lists locally available casks"
     brew search --casks
 end
@@ -852,25 +858,27 @@ __complete_brew_sub_arg 'cask' 'list ls' -s 1        -d "Format output in a sing
 __complete_brew_sub_arg 'cask' 'list ls' -l versions -d "Show all installed versions"
 
 __complete_brew_sub_cmd 'cask' 'outdated'  "List the outdated installed Casks"
-__complete_brew_sub_arg 'cask' 'outdated' -l greedy -d "Include the Casks having auto_updates true or version :latest"
+__complete_brew_sub_arg 'cask' 'outdated upgrade' -l greedy -d "Include the Casks having auto_updates true or version :latest"
 __complete_brew_sub_arg 'cask' 'outdated; and not __fish_brew_opt --verbose --quiet' -l verbose -d "Display outdated and the latest version"
 __complete_brew_sub_arg 'cask' 'outdated; and not __fish_brew_opt --verbose --quiet' -l quiet   -d "Suppress versions from the output"
 
 __complete_brew_sub_cmd 'cask' 'reinstall' "Reinstall the given Cask"
 
-__complete_brew_sub_cmd 'cask' 'search'    "Searche all known Casks"
-
 __complete_brew_sub_cmd 'cask' 'style'     "Check Cask style using RuboCop"
 __complete_brew_sub_arg 'cask' 'style' -l fix -d "Auto-correct any style errors if possible"
+
+__complete_brew_sub_cmd 'cask' 'upgrade'     "Upgrades all outdated casks"
+__complete_brew_sub_arg 'cask' 'upgrade' -l force
 
 __complete_brew_sub_cmd 'cask' 'uninstall' "Uninstall the given Cask"
 __complete_brew_sub_arg 'cask' 'uninstall remove rm' -l force -d "Uninstall even if the Cask is not present"
 
 __complete_brew_sub_cmd 'cask' 'zap'       "Zap all files associated with the given Cask"
 
-# Common argument for these commands: either all available or only installed cask tokens:
+# Common argument for these commands: either all available, only installed cask tokens, or outdated casks:
 __complete_brew_sub_arg 'cask' 'audit cat edit fetch home homepage info abv install style' -a '(__suggest_brew_casks_all)'
 __complete_brew_sub_arg 'cask' 'list ls reinstall outdated uninstall remove rm zap'        -a '(__suggest_brew_casks_installed)'
+__complete_brew_sub_arg 'cask' 'upgrade'        -a '(__suggest_brew_casks_outdated)'
 
 
 ################
