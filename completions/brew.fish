@@ -98,7 +98,7 @@ function __suggest_brew_formulae_all -d 'Lists all available formulae with their
             '.each{ |k, v| puts([k, v].reject(&:nil?).join("\t")) }'
         # backup: (note that it lists only formulae names without descriptions)
     else
-        brew search
+        brew formulae
     end
 end
 
